@@ -1,0 +1,64 @@
+{
+  "matrix_name": "incremental_10s_shootout",
+  "baseline_version_id": "baseline_e6d193e",
+  "clip_seconds": 10,
+  "repeats": 10,
+  "warmup_repeats": 1,
+  "audio_path": "perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav",
+  "model_path": "~/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
+  "variants": [
+    {
+      "id": "baseline_e6d193e",
+      "type": "voxmlx",
+      "ref": "e6d193e85e84e30f26e370c66973ce287b8a9d57",
+      "description": "Original baseline commit"
+    },
+    {
+      "id": "fix1_kvcache_trim",
+      "type": "voxmlx",
+      "ref": "codex/awni-fix1-kvcache-trim",
+      "description": "Baseline + KV cache concat trim fix (incremental-relevant)"
+    },
+    {
+      "id": "fix2_encoder_window",
+      "type": "voxmlx",
+      "ref": "codex/awni-fix2-encoder-window",
+      "description": "Baseline + encoder sliding-window cache init fix (incremental-relevant)"
+    },
+    {
+      "id": "perf_ea25661",
+      "type": "voxmlx",
+      "ref": "ea25661",
+      "description": "Performance attempt commit (audio-path optimizations)"
+    },
+    {
+      "id": "current_consolidated",
+      "type": "voxmlx",
+      "ref": "codex/consolidated-post-e6d193e",
+      "description": "Current consolidated branch"
+    },
+    {
+      "id": "voxtralc_reference",
+      "type": "voxtralc",
+      "bin_path": "/Users/artus/GitRepos/voxtral.c/voxtral",
+      "model_dir": "/Volumes/BigStore/voxtral-model",
+      "extra_args": [
+      ],
+      "description": "voxtral.c file transcription CLI reference"
+    },
+    {
+      "id": "fix3_encode_tail_trim_nonincremental_only",
+      "type": "voxmlx",
+      "ref": "codex/awni-fix3-encode-tail-trim",
+      "enabled": false,
+      "description": "Ignored for incremental-only benchmark (offline encode path only)"
+    },
+    {
+      "id": "fix4_generate_flush_nonincremental_only",
+      "type": "voxmlx",
+      "ref": "codex/awni-fix4-generate-flush",
+      "enabled": false,
+      "description": "Ignored for incremental-only benchmark (offline generate path only)"
+    }
+  ]
+}

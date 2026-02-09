@@ -81,6 +81,47 @@ Outputs:
 - Aggregated report: `perf/batch_runs/<campaign>/summary.json`\n
 - Flat per-run table: `perf/batch_runs/<campaign>/runs.csv`
 
+## Incremental-only 10s shootout (Mac Mini)
+
+This lane avoids non-incremental paths and compares:
+- `voxtral.c` CLI reference
+- baseline `e6d193e85e84e30f26e370c66973ce287b8a9d57`
+- selected single-change variants that are meaningful for incremental processing
+
+Matrix file:
+- `perf/incremental_10s_matrix.json`
+
+Dry run (prepare commands/worktrees only):
+
+```bash
+python3 scripts/run_incremental_10s_matrix.py \
+  --matrix perf/incremental_10s_matrix.json \
+  --campaign macmini-incremental-10s-dry \
+  --dry-run
+```
+
+Actual run (strictly sequential):
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/run_incremental_10s_matrix.py \
+  --matrix perf/incremental_10s_matrix.json \
+  --campaign macmini-incremental-10s
+```
+
+Optional backend pin:
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/run_incremental_10s_matrix.py \
+  --matrix perf/incremental_10s_matrix.json \
+  --campaign macmini-incremental-10s-dft \
+  --stft-backend dft
+```
+
+Outputs:
+- Per-variant transcript + timing: `perf/audio_runs/<campaign>__<variant>/`
+- Aggregated matrix summary: `perf/batch_runs/<campaign>/summary.json`
+- Flat summary table: `perf/batch_runs/<campaign>/summary.csv`
+
 ## Health checks
 
 - Verify branch and cleanliness:

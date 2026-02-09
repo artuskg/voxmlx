@@ -118,6 +118,35 @@ This runs each configured version sequentially and writes aggregate outputs to:
 - `perf/batch_runs/<campaign>/summary.json`
 - `perf/batch_runs/<campaign>/runs.csv`
 
+## Incremental-only 10s Comparison (Prepared for Mac Mini)
+
+For focused incremental-path comparisons (no non-incremental `generate.py` path), use:
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/run_incremental_10s_matrix.py \
+  --matrix perf/incremental_10s_matrix.json \
+  --campaign macmini-incremental-10s
+```
+
+Dry-run preparation only:
+
+```bash
+python3 scripts/run_incremental_10s_matrix.py \
+  --matrix perf/incremental_10s_matrix.json \
+  --campaign macmini-incremental-10s-dry \
+  --dry-run
+```
+
+What this matrix is designed to compare:
+- `voxtral.c` CLI reference
+- baseline `e6d193e85e84e30f26e370c66973ce287b8a9d57`
+- selected meaningful incremental variants
+- it intentionally disables variants that only affect non-incremental code paths
+
+Outputs:
+- Per-variant transcript + timing stats under `perf/audio_runs/<campaign>__<variant>/`
+- Aggregated table under `perf/batch_runs/<campaign>/summary.json` and `summary.csv`
+
 ## Non-Incremental vs Incremental Divergence Tracing
 
 To pinpoint where non-incremental decoding starts to diverge from incremental decoding
