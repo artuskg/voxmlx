@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: summarize refreshed sequential final-run metrics and explain the final-code changes.
-- Next: if needed, run a controlled sequential baseline+final suite under lower system load to reduce timing variance.
+- Now: hand off new Mac Mini batch workflow (version matrix + sequential runner + docs).
+- Next: run the matrix on Mac Mini for 10x repeats per version and review aggregate stats.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -43,12 +43,18 @@ Done:
   - old/new SHA-256: `c884ae4d490915b3d5bd6cfc61d1cb37485d58df1b4cd92404ec2fbb95348e5f`
 - Deleted `perf/audio_runs/baseline-v1-clip180-create-gt` on user request.
 - Reran `final-ea25661-clip180` and `final-ea25661-clip180-r2` sequentially.
+- Added `scripts/run_version_matrix.py` for sequential multi-version repeated runs (worktree-based, per-version refs, aggregated summary outputs).
+- Added matrix definition `perf/version_matrix.json` (baseline + final refs, repeat count, clip config, paths).
+- Updated `RUNBOOK.md` and `docs/correctness_performance.md` with Mac Mini workflow commands and output locations.
+- Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
 
 Now:
-- Report sequential rerun results and explain what changed in the final code path.
+- Validate runner in `--dry-run` mode and publish usage for Mac Mini execution.
 
 Next:
-- Optional: run same evaluation with longer clips (e.g., 600s) or full files to confirm scaling.
+- Execute on Mac Mini:
+  - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --campaign <campaign-name>`
+- Compare `perf/batch_runs/<campaign>/summary.json` means/stdevs and decide next optimization targets.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -61,6 +67,9 @@ Working set (files/ids/commands):
 - `perf/audio_runs/*/metrics.json`
 - `perf/audio_runs/*/*_transcript.txt`
 - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label ...`
+- `scripts/run_version_matrix.py`
+- `perf/version_matrix.json`
+- `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --dry-run`
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
 

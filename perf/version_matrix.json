@@ -1,0 +1,23 @@
+{
+  "matrix_name": "voxtral_clip180",
+  "baseline_version_id": "baseline_v2",
+  "repeats": 10,
+  "clip_seconds": 180,
+  "warmup_seconds": 10,
+  "model_path": "~/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
+  "mono_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k.wav",
+  "stereo_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k.wav",
+  "ground_truth_path": "perf/ground_truth_mono.txt",
+  "versions": [
+    {
+      "id": "baseline_v2",
+      "ref": "9a08382",
+      "description": "Ground-truth-stable baseline rerun"
+    },
+    {
+      "id": "final_ea25661",
+      "ref": "ea25661",
+      "description": "Cached DFT basis + reduced clear_cache frequency"
+    }
+  ]
+}

@@ -55,6 +55,7 @@ At the beginning of a new session, before starting the actual work, offer the us
 
 - Keep default CI lightweight: correctness tests and pure-function perf checks must run without downloading large models.
 - Model-backed differential tests are optional and must be gated behind environment variables.
+- For audio performance experiments, run versions sequentially (never in parallel) and prefer repeated runs via `scripts/run_version_matrix.py` + `perf/version_matrix.json` on a dedicated machine.
 - When changing correctness/performance workflow, update both:
   - `docs/correctness_performance.md`
   - `RUNBOOK.md`

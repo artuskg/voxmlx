@@ -91,3 +91,15 @@ PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py \
   --clip-seconds 180 \
   --ground-truth-path perf/ground_truth_mono.txt
 ```
+
+For repeated multi-version runs on a dedicated machine (for better stats under noisy local load), use:
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
+  --matrix perf/version_matrix.json \
+  --campaign macmini-voxtral-clip180
+```
+
+This runs each configured version sequentially and writes aggregate outputs to:
+- `perf/batch_runs/<campaign>/summary.json`
+- `perf/batch_runs/<campaign>/runs.csv`

@@ -39,6 +39,33 @@
 - Run:
   - `VOXMLX_ENABLE_MODEL_TESTS=1 VOXMLX_TEST_MODEL_PATH=... VOXMLX_TEST_AUDIO_PATH=... python3 -m unittest tests.test_model_differential -v`
 
+## Batch version runner (Mac Mini workflow)
+
+Use this when local machine load is noisy and you want stronger statistics.
+
+Matrix file (editable): `perf/version_matrix.json`
+- Defines versions (`id`, `ref`, `description`) to run.
+- Defines baseline version, clip duration, and repeat count.
+
+Dry run (sanity-check refs/commands only):
+
+```bash
+python3 scripts/run_version_matrix.py --matrix perf/version_matrix.json --dry-run
+```
+
+Actual run (strictly sequential):
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
+  --matrix perf/version_matrix.json \
+  --campaign macmini-voxtral-clip180
+```
+
+Outputs:
+- Per-run raw metrics/transcripts: `perf/audio_runs/<campaign>__<version>__rNN/`\n
+- Aggregated report: `perf/batch_runs/<campaign>/summary.json`\n
+- Flat per-run table: `perf/batch_runs/<campaign>/runs.csv`
+
 ## Health checks
 
 - Verify branch and cleanliness:
