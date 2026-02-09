@@ -1,0 +1,47 @@
+{
+  "commit": "a4f3ac6f63f59dbb7f6a0053f45af93fa17bf42e",
+  "ref_path": "perf/ground_truth_mono.txt",
+  "stereo_path": "/Users/crabbotix/gitrepos/voxmlx/perf/audio_runs/incoming-only-clip600-r3-correctnessgt-fft__incoming_dc994b1__r02/stereo_transcript.txt",
+  "sha_ref": "8febd5d6bf793ce775a9e3f4372c66b51e19fd1d476a58ce8be13abc63936e79",
+  "sha_stereo": "785999f5c2ecbd1fa93b28b4db8f59a67144f93a57ec6ccfa96bbfc08a2c38a9",
+  "stats": {
+    "raw": {
+      "len_ref": 8452,
+      "len_stereo": 6615,
+      "words_ref": 1628,
+      "words_stereo": 1276,
+      "levenshtein_distance": 3056,
+      "norm_over_ref": 0.3615712257453857,
+      "norm_over_max": 0.3615712257453857,
+      "sequence_match_ratio": 0.13167850268799364,
+      "exact_match": false
+    },
+    "ws_normalized": {
+      "len_ref": 8451,
+      "len_stereo": 6614,
+      "words_ref": 1628,
+      "words_stereo": 1276,
+      "levenshtein_distance": 3056,
+      "norm_over_ref": 0.3616140101763105,
+      "norm_over_max": 0.3616140101763105,
+      "sequence_match_ratio": 0.1315632260205775,
+      "exact_match": false
+    },
+    "alnum_lower_ws_normalized": {
+      "len_ref": 8191,
+      "len_stereo": 6344,
+      "words_ref": 1628,
+      "words_stereo": 1276,
+      "levenshtein_distance": 2816,
+      "norm_over_ref": 0.34379196679282137,
+      "norm_over_max": 0.34379196679282137,
+      "sequence_match_ratio": 0.16842105263157894,
+      "exact_match": false
+    }
+  },
+  "mismatch": {
+    "first_mismatch_index": 377,
+    "ref_context": "and then write the final app store listing. Use these steps to position your app before you even write a line of code using Codex or Claude code. Let's dive in. Why do most apps fail before they launch? If you've ever launched an app and it got crickets on the app store, you're d",
+    "stereo_context": "and then write the final app store listing. Use these steps to position your app before you even write a line of code using Codex or Claude Code. Let's dive in. Why do most apps fail before they launch? If you've ever launched an app and it got crooked on the app store, you're do"
+  }
+}

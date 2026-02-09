@@ -181,6 +181,15 @@ Done:
   - `perf/batch_runs/incoming-only-clip600-r3-correctnessgt-fft/summary.json`
   - `perf/batch_runs/incoming-only-clip600-r3-correctnessgt-fft/runs.csv`
   - `perf/batch_runs/incoming-only-clip600-r3-backend-comparison.md`
+- 2026-02-09: Compared FFT stereo output file against canonical reference from `codex/correctness-performance-scaffold` commit `a4f3ac6f63f59dbb7f6a0053f45af93fa17bf42e`:
+  - Canonical ref file: `perf/ground_truth_mono.txt` at that commit (`sha256=8febd5d6...`).
+  - Compared file: `perf/audio_runs/incoming-only-clip600-r3-correctnessgt-fft__incoming_dc994b1__r02/stereo_transcript.txt` (`sha256=785999f5...`).
+  - Raw comparison:
+    - chars `8452` (ref) vs `6615` (stereo)
+    - words `1628` (ref) vs `1276` (stereo)
+    - Levenshtein `3056`, normalized `0.361571`
+    - sequence ratio `0.131679`
+  - Even after lowercase/alnum/whitespace normalization, distance remains high (`0.343792` normalized), so divergence is semantic/content-level, not just punctuation/casing.
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
