@@ -1,0 +1,10 @@
+version_id,description,commit,run_index,label,total_elapsed_seconds,mean_norm_edit_distance,mean_token_error_ratio
+incoming_59735f8,Cache/alignment fixes with runtime consistency guards,59735f8,1,incoming-only-clip600-r3-correctnessgt__incoming_59735f8__r01,319.71900162496604,0.8727520113582584,0.89004914004914
+incoming_59735f8,Cache/alignment fixes with runtime consistency guards,59735f8,2,incoming-only-clip600-r3-correctnessgt__incoming_59735f8__r02,320.35072695906274,0.8727520113582584,0.89004914004914
+incoming_59735f8,Cache/alignment fixes with runtime consistency guards,59735f8,3,incoming-only-clip600-r3-correctnessgt__incoming_59735f8__r03,305.38486462505534,0.8727520113582584,0.89004914004914
+incoming_cce41e1,Streaming transcription state refactor,cce41e1,1,incoming-only-clip600-r3-correctnessgt__incoming_cce41e1__r01,306.0576578339096,0.8727520113582584,0.89004914004914
+incoming_cce41e1,Streaming transcription state refactor,cce41e1,2,incoming-only-clip600-r3-correctnessgt__incoming_cce41e1__r02,307.8822143750731,0.8727520113582584,0.89004914004914
+incoming_cce41e1,Streaming transcription state refactor,cce41e1,3,incoming-only-clip600-r3-correctnessgt__incoming_cce41e1__r03,301.21769929211587,0.8727520113582584,0.89004914004914
+incoming_dc994b1,Prompt constants centralization + model timing config validation,dc994b1,1,incoming-only-clip600-r3-correctnessgt__incoming_dc994b1__r01,299.039487458067,0.8727520113582584,0.89004914004914
+incoming_dc994b1,Prompt constants centralization + model timing config validation,dc994b1,2,incoming-only-clip600-r3-correctnessgt__incoming_dc994b1__r02,298.8029632079415,0.8727520113582584,0.89004914004914
+incoming_dc994b1,Prompt constants centralization + model timing config validation,dc994b1,3,incoming-only-clip600-r3-correctnessgt__incoming_dc994b1__r03,316.3680677919183,0.8727520113582584,0.89004914004914

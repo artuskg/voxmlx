@@ -1,0 +1,149 @@
+{
+  "campaign": "incoming-only-clip600-r3-correctnessgt",
+  "clip_seconds": 600,
+  "generated_at_utc": "2026-02-09T15:40:33.970818+00:00",
+  "ground_truth_path": "/tmp/ground_truth_mono_correctness_cb81d75.txt",
+  "matrix_path": "/tmp/voxmlx_matrix_incoming_r3.json",
+  "model_path": "/Users/crabbotix/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
+  "mono_path": "/tmp/voxtral_ref_mono_10min.wav",
+  "repeats": 3,
+  "run_rows": [
+    {
+      "commit": "59735f8",
+      "description": "Cache/alignment fixes with runtime consistency guards",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_59735f8__r01",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 1,
+      "total_elapsed_seconds": 319.71900162496604,
+      "version_id": "incoming_59735f8"
+    },
+    {
+      "commit": "59735f8",
+      "description": "Cache/alignment fixes with runtime consistency guards",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_59735f8__r02",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 2,
+      "total_elapsed_seconds": 320.35072695906274,
+      "version_id": "incoming_59735f8"
+    },
+    {
+      "commit": "59735f8",
+      "description": "Cache/alignment fixes with runtime consistency guards",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_59735f8__r03",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 3,
+      "total_elapsed_seconds": 305.38486462505534,
+      "version_id": "incoming_59735f8"
+    },
+    {
+      "commit": "cce41e1",
+      "description": "Streaming transcription state refactor",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_cce41e1__r01",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 1,
+      "total_elapsed_seconds": 306.0576578339096,
+      "version_id": "incoming_cce41e1"
+    },
+    {
+      "commit": "cce41e1",
+      "description": "Streaming transcription state refactor",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_cce41e1__r02",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 2,
+      "total_elapsed_seconds": 307.8822143750731,
+      "version_id": "incoming_cce41e1"
+    },
+    {
+      "commit": "cce41e1",
+      "description": "Streaming transcription state refactor",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_cce41e1__r03",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 3,
+      "total_elapsed_seconds": 301.21769929211587,
+      "version_id": "incoming_cce41e1"
+    },
+    {
+      "commit": "dc994b1",
+      "description": "Prompt constants centralization + model timing config validation",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_dc994b1__r01",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 1,
+      "total_elapsed_seconds": 299.039487458067,
+      "version_id": "incoming_dc994b1"
+    },
+    {
+      "commit": "dc994b1",
+      "description": "Prompt constants centralization + model timing config validation",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_dc994b1__r02",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 2,
+      "total_elapsed_seconds": 298.8029632079415,
+      "version_id": "incoming_dc994b1"
+    },
+    {
+      "commit": "dc994b1",
+      "description": "Prompt constants centralization + model timing config validation",
+      "label": "incoming-only-clip600-r3-correctnessgt__incoming_dc994b1__r03",
+      "mean_norm_edit_distance": 0.8727520113582584,
+      "mean_token_error_ratio": 0.89004914004914,
+      "run_index": 3,
+      "total_elapsed_seconds": 316.3680677919183,
+      "version_id": "incoming_dc994b1"
+    }
+  ],
+  "stereo_path": "/tmp/voxtral_ref_stereo_10min.wav",
+  "summary": {
+    "baseline_mean_total_elapsed_seconds": null,
+    "baseline_version_id": "baseline_v2",
+    "versions": [
+      {
+        "commit": "59735f8",
+        "description": "Cache/alignment fixes with runtime consistency guards",
+        "max_total_elapsed_seconds": 320.35072695906274,
+        "mean_norm_edit_distance": 0.8727520113582584,
+        "mean_token_error_ratio": 0.89004914004914,
+        "mean_total_elapsed_seconds": 315.1515310696947,
+        "min_total_elapsed_seconds": 305.38486462505534,
+        "runs": 3,
+        "speedup_vs_baseline_percent": null,
+        "stdev_total_elapsed_seconds": 6.910889923643134,
+        "version_id": "incoming_59735f8"
+      },
+      {
+        "commit": "cce41e1",
+        "description": "Streaming transcription state refactor",
+        "max_total_elapsed_seconds": 307.8822143750731,
+        "mean_norm_edit_distance": 0.8727520113582584,
+        "mean_token_error_ratio": 0.89004914004914,
+        "mean_total_elapsed_seconds": 305.0525238336995,
+        "min_total_elapsed_seconds": 301.21769929211587,
+        "runs": 3,
+        "speedup_vs_baseline_percent": null,
+        "stdev_total_elapsed_seconds": 2.8120764678465906,
+        "version_id": "incoming_cce41e1"
+      },
+      {
+        "commit": "dc994b1",
+        "description": "Prompt constants centralization + model timing config validation",
+        "max_total_elapsed_seconds": 316.3680677919183,
+        "mean_norm_edit_distance": 0.8727520113582584,
+        "mean_token_error_ratio": 0.89004914004914,
+        "mean_total_elapsed_seconds": 304.7368394859756,
+        "min_total_elapsed_seconds": 298.8029632079415,
+        "runs": 3,
+        "speedup_vs_baseline_percent": null,
+        "stdev_total_elapsed_seconds": 8.225087227863552,
+        "version_id": "incoming_dc994b1"
+      }
+    ]
+  },
+  "warmup_seconds": 10
+}
