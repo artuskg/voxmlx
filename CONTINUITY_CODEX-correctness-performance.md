@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: verification pass against updated external review is complete; commit/push hardening fixes.
-- Next: rerun updated 10-minute matrix on Mac Mini for 10x repeats per version.
+- Now: commit/push KV cache + RoPE scaffold tests for future ring-buffer replacement.
+- Next: gather external references and implement ring-buffer cache against scaffold contracts.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -70,6 +70,14 @@ Done:
   - #12 Fixed: shared constants are centralized (`voxmlx/constants.py`), prompt-token defaults now consume them in `voxmlx/contracts.py`, CLI help no longer hardcodes decoder-window literals, and `load_model()` now validates config `downsample_factor` assumptions in `voxmlx/__init__.py`.
   - #13 Fixed: remap regex patterns precompiled in `voxmlx/contracts.py`.
   - #14 Fixed: decoder `sliding_window` is now configurable through API/CLI and defaults to config value when available.
+- Added low-level KV/RoPE scaffold tests for cache-replacement work:
+  - new optional test module `tests/test_kv_cache_rope_scaffold_optional.py`
+  - contracts covered:
+    - mixed update sequences preserve expected key/value set + offset progression
+    - concat-only updates preserve temporal tail ordering
+    - chunked-update cache behavior is equivalent to tokenwise updates (set-wise, order-agnostic)
+    - RoPE chunk offset application matches full-sequence RoPE exactly
+    - decode-step attention using cache matches reference tail-window attention with RoPE offsets
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -77,18 +85,23 @@ Done:
   - `python3 -m py_compile voxmlx/__init__.py voxmlx/contracts.py voxmlx/stream.py` -> pass.
   - `python3 -m py_compile voxmlx/cache.py voxmlx/model.py voxmlx/stream.py voxmlx/audio.py` -> pass.
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass after adding first-update oversize cache guard test.
+  - `python3 -m py_compile tests/test_kv_cache_rope_scaffold_optional.py` -> pass.
+  - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
+  - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional tests.test_kv_cache_rope_scaffold_optional -v` -> pass.
 
 Now:
-- Commit/push review hardening updates and provide itemized verification summary.
+- Commit and push scaffold tests (no implementation changes to cache architecture).
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
 - Address any regressions found during matrix runs.
+- Use the new KV/RoPE scaffold tests while implementing ring-buffer cache replacement.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
 
 Working set (files/ids/commands):
+- `tests/test_kv_cache_rope_scaffold_optional.py` (new)
 - `voxmlx/cache.py`
 - `voxmlx/model.py`
 - `voxmlx/stream.py`
