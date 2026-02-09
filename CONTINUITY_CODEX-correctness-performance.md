@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: integrate consolidated code-review fixes and record per-issue status in ledger.
-- Next: run updated 10-minute matrix on Mac Mini for 10x repeats per version.
+- Now: commit and push the `stream.py` class refactor with validation evidence.
+- Next: rerun updated 10-minute matrix on Mac Mini for 10x repeats per version.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -65,7 +65,7 @@ Done:
   - #7 Addressed with guard: optional FFT backend via `VOXMLX_STFT_BACKEND=fft` in `voxmlx/audio.py`; default remains DFT for compatibility.
   - #8 Fixed + guarded: offline and streaming mel paths are feature-compatible; overlap state corrected and optional runtime test added (`tests/test_mlx_runtime_optional.py`).
   - #9 Addressed: resampling limitation documented in `voxmlx/audio.py`.
-  - #10 Partially addressed: streaming state complexity reduced with queue classes; full `StreamingTranscriber` class refactor deferred.
+  - #10 Fixed: `voxmlx/stream.py` now uses explicit `StreamingTranscriber` class state/methods instead of nested nonlocal state management.
   - #11 Fixed: reusable `Transcriber` API added in `voxmlx/__init__.py`; `transcribe()` can reuse preloaded bundle.
   - #12 Partially fixed: shared constants centralized in `voxmlx/constants.py` and wired across audio/prompt/stream defaults.
   - #13 Fixed: remap regex patterns precompiled in `voxmlx/contracts.py`.
@@ -73,16 +73,17 @@ Done:
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
+  - `python3 -m py_compile voxmlx/stream.py voxmlx/audio.py voxmlx/model.py` -> pass.
 
 Now:
-- Commit/push consolidated review fixes and updated ledger.
+- Commit and push the class-based streaming refactor and ledger updates.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
+- Address any regressions found during matrix runs.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
-- UNCONFIRMED: whether to prioritize full `StreamingTranscriber` class refactor (#10) in this branch.
 
 Working set (files/ids/commands):
 - `scripts/audio_eval.py`
