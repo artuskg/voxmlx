@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: blocked on requested incremental-10s matrix run because referenced scripts/config are not present after pull/fetch in available remote branches.
-- Next: resolve commit/branch containing `incremental_file_eval.py`, `run_incremental_10s_matrix.py`, and `perf/incremental_10s_matrix.json`, then execute dry-run + full run.
+- Now: completed incremental-only 10s dry-run + full sequential matrix run from consolidated branch head.
+- Next: decide whether to commit matrix-runner compatibility fixes (old-ref constants fallback + remote-ref normalization) into the branch or keep them as local runtime adjustments only.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -204,6 +204,39 @@ Done:
     - `scripts/run_incremental_10s_matrix.py`
     - `perf/incremental_10s_matrix.json`
   - No executable fallback with those exact commands is possible until commit/ref with those files is available in this clone.
+- 2026-02-09: Pulled again; consolidated branch advanced to `3db920d` and now includes incremental-only runner files:
+  - `scripts/incremental_file_eval.py`
+  - `scripts/run_incremental_10s_matrix.py`
+  - `perf/incremental_10s_matrix.json`
+- 2026-02-09: Executed requested incremental-only commands from detached consolidated worktree:
+  - Worktree: `/Users/crabbotix/gitrepos/voxmlx/.tmp_incremental_matrix_3db920d` (`HEAD=3db920d`)
+  - Dry-run (successful):
+    - `.venv313/bin/python scripts/run_incremental_10s_matrix.py --matrix /tmp/incremental_10s_matrix.local.json --campaign macmini-incremental-10s-dry --python /Users/crabbotix/gitrepos/voxmlx/.venv313/bin/python --dry-run`
+  - Full run (successful):
+    - `PYTHONPATH=/Users/crabbotix/gitrepos/voxmlx/.tmp_incremental_matrix_3db920d .venv313/bin/python scripts/run_incremental_10s_matrix.py --matrix /tmp/incremental_10s_matrix.local.json --campaign macmini-incremental-10s --python /Users/crabbotix/gitrepos/voxmlx/.venv313/bin/python`
+  - Runtime adjustments required on this machine:
+    - matrix local copy `/tmp/incremental_10s_matrix.local.json` with:
+      - `voxtralc_reference.bin_path` changed from `/Users/artus/GitRepos/voxtral.c/voxtral` to `/Users/crabbotix/gitrepos/voxtral.c/voxtral`
+      - branch refs normalized to remote-tracking names (`origin/codex/...`) for worktree checkout
+    - local compatibility shim in worktree evaluator:
+      - fallback `DEFAULT_DECODER_SLIDING_WINDOW=8192` if `voxmlx.constants` is missing (needed for baseline `e6d193e`)
+  - Outputs:
+    - `/Users/crabbotix/gitrepos/voxmlx/.tmp_incremental_matrix_3db920d/perf/batch_runs/macmini-incremental-10s/summary.json`
+    - `/Users/crabbotix/gitrepos/voxmlx/.tmp_incremental_matrix_3db920d/perf/batch_runs/macmini-incremental-10s/summary.csv`
+  - Key timing results (10s clip, repeats=10):
+    - `baseline_e6d193e`: `4.731s` (encode `2.433s`, decode `2.298s`) — baseline
+    - `fix1_kvcache_trim`: `4.873s` (`-3.004%` vs baseline)
+    - `fix2_encoder_window`: `4.767s` (`-0.768%`)
+    - `perf_ea25661`: `4.724s` (`+0.156%`)
+    - `current_consolidated` (`3db920d`): `4.724s` (`+0.143%`)
+    - `voxtralc_reference`: `12.192s` (`-157.695%` vs baseline)
+  - Transcript outputs:
+    - `.../perf/audio_runs/audio_runs__baseline_e6d193e/mono_incremental_transcript.txt`
+    - `.../perf/audio_runs/audio_runs__fix1_kvcache_trim/mono_incremental_transcript.txt`
+    - `.../perf/audio_runs/audio_runs__fix2_encoder_window/mono_incremental_transcript.txt`
+    - `.../perf/audio_runs/audio_runs__perf_ea25661/mono_incremental_transcript.txt`
+    - `.../perf/audio_runs/audio_runs__current_consolidated/mono_incremental_transcript.txt`
+    - `.../perf/audio_runs/audio_runs__voxtralc_reference/mono_incremental_transcript.txt`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
