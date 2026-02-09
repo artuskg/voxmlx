@@ -1,6 +1,7 @@
 import argparse
 import threading
 import time
+from collections import deque
 
 import mlx.core as mx
 import numpy as np
@@ -10,14 +11,114 @@ from mistral_common.tokens.tokenizers.base import SpecialTokenPolicy
 from . import _build_prompt_tokens, load_model
 from .audio import SAMPLES_PER_TOKEN, log_mel_spectrogram_step
 from .cache import RotatingKVCache
+from .constants import (
+    DEFAULT_CLEAR_CACHE_INTERVAL,
+    DEFAULT_DECODER_SLIDING_WINDOW,
+    DEFAULT_LEFT_PAD_TOKENS,
+    DEFAULT_RIGHT_PAD_TOKENS,
+)
 
-N_LEFT_PAD_TOKENS = 32
-N_RIGHT_PAD_TOKENS = 17
+
+class AudioSampleQueue:
+    """Chunked audio buffer that avoids O(n^2) append behavior."""
+
+    def __init__(self):
+        self._chunks = deque()
+        self._len = 0
+
+    def __len__(self):
+        return self._len
+
+    def clear(self):
+        self._chunks.clear()
+        self._len = 0
+
+    def append(self, samples: np.ndarray):
+        if samples is None or samples.size == 0:
+            return
+        arr = np.asarray(samples, dtype=np.float32)
+        self._chunks.append(arr)
+        self._len += arr.shape[0]
+
+    def append_many(self, chunks):
+        for chunk in chunks:
+            self.append(chunk)
+
+    def pop(self, n: int) -> np.ndarray:
+        if n <= 0:
+            return np.zeros(0, dtype=np.float32)
+        if n > self._len:
+            raise ValueError(f"Requested {n} samples with only {self._len} buffered")
+
+        pieces = []
+        remain = n
+        while remain > 0:
+            head = self._chunks[0]
+            if head.shape[0] <= remain:
+                pieces.append(self._chunks.popleft())
+                remain -= head.shape[0]
+            else:
+                pieces.append(head[:remain])
+                self._chunks[0] = head[remain:]
+                remain = 0
+
+        self._len -= n
+        if len(pieces) == 1:
+            return pieces[0]
+        return np.concatenate(pieces)
+
+
+class EmbeddingQueue:
+    """Chunked embedding buffer that minimizes repeated mx.concatenate calls."""
+
+    def __init__(self):
+        self._chunks = deque()
+        self._len = 0
+
+    def __len__(self):
+        return self._len
+
+    def clear(self):
+        self._chunks.clear()
+        self._len = 0
+
+    def append(self, embeds: mx.array | None):
+        if embeds is None:
+            return
+        if embeds.shape[0] == 0:
+            return
+        self._chunks.append(embeds)
+        self._len += embeds.shape[0]
+
+    def pop(self, n: int) -> mx.array:
+        if n <= 0:
+            return mx.zeros((0, 0))
+        if n > self._len:
+            raise ValueError(f"Requested {n} embeds with only {self._len} buffered")
+
+        parts = []
+        remain = n
+        while remain > 0:
+            head = self._chunks[0]
+            h = head.shape[0]
+            if h <= remain:
+                parts.append(self._chunks.popleft())
+                remain -= h
+            else:
+                parts.append(head[:remain])
+                self._chunks[0] = head[remain:]
+                remain = 0
+
+        self._len -= n
+        if len(parts) == 1:
+            return parts[0]
+        return mx.concatenate(parts, axis=0)
 
 
 def stream_transcribe(
     model_path: str = "mlx-community/Voxtral-Mini-4B-Realtime-6bit",
     temperature: float = 0.0,
+    sliding_window: int | None = None,
 ):
     model, sp, config = load_model(model_path)
 
@@ -33,7 +134,8 @@ def stream_transcribe(
     mx.eval(text_embeds)
 
     n_layers = len(model.language_model.layers)
-    sliding_window = 8192
+    if sliding_window is None:
+        sliding_window = int(config.get("sliding_window", DEFAULT_DECODER_SLIDING_WINDOW))
 
     def sample(logits):
         if temperature <= 0:
@@ -66,21 +168,21 @@ def stream_transcribe(
             )
             print(text, end="", flush=True)
 
-            if i > 0 and i % 256 == 0:
+            if i > 0 and i % DEFAULT_CLEAR_CACHE_INTERVAL == 0:
                 mx.clear_cache()
 
             y = next_y
 
         return n_to_decode, False
 
-    # Audio buffer and lock
+    # Audio callback buffer and lock
     lock = threading.Lock()
-    audio_buf = np.zeros(0, dtype=np.float32)
+    callback_chunks = deque()
 
     def callback(indata, frames, time_info, status):
-        nonlocal audio_buf
+        del frames, time_info, status
         with lock:
-            audio_buf = np.append(audio_buf, indata[:, 0])
+            callback_chunks.append(indata[:, 0].copy())
 
     # Decoder state
     cache = None
@@ -94,8 +196,8 @@ def stream_transcribe(
     ds_buf = None           # partial downsample group
 
     # Bounded buffers and counters
-    pending_audio = np.zeros(0, dtype=np.float32)  # unprocessed audio remainder
-    audio_embeds = None     # only undecoded embeddings
+    pending_audio = AudioSampleQueue()  # unprocessed audio remainder
+    audio_embeds = EmbeddingQueue()     # undecoded embeddings
     n_audio_samples_fed = 0 # total real audio samples fed (for safe decode limit)
     n_total_decoded = 0     # total positions consumed (prefill + decode)
     first_cycle = True
@@ -110,8 +212,8 @@ def stream_transcribe(
         conv2_tail = None
         encoder_cache = None
         ds_buf = None
-        pending_audio = np.zeros(0, dtype=np.float32)
-        audio_embeds = None
+        pending_audio.clear()
+        audio_embeds.clear()
         n_audio_samples_fed = 0
         n_total_decoded = 0
         first_cycle = True
@@ -132,13 +234,13 @@ def stream_transcribe(
         start_time = time.monotonic()
         warned_no_audio = False
         while True:
-            # Drain new audio from buffer (swap, not copy)
+            # Drain new callback chunks.
             with lock:
-                new_audio = audio_buf
-                audio_buf = np.zeros(0, dtype=np.float32)
+                new_chunks = list(callback_chunks)
+                callback_chunks.clear()
 
-            if len(new_audio) > 0:
-                pending_audio = np.append(pending_audio, new_audio)
+            if new_chunks:
+                pending_audio.append_many(new_chunks)
 
             if first_cycle and len(pending_audio) < SAMPLES_PER_TOKEN:
                 elapsed = time.monotonic() - start_time
@@ -157,13 +259,13 @@ def stream_transcribe(
             if first_cycle and len(pending_audio) >= SAMPLES_PER_TOKEN:
                 # First cycle: feed left-pad + all available audio
                 left_pad = np.zeros(
-                    N_LEFT_PAD_TOKENS * SAMPLES_PER_TOKEN, dtype=np.float32
+                    DEFAULT_LEFT_PAD_TOKENS * SAMPLES_PER_TOKEN, dtype=np.float32
                 )
                 n_feed = (
                     (len(pending_audio) // SAMPLES_PER_TOKEN) * SAMPLES_PER_TOKEN
                 )
-                chunk = np.concatenate([left_pad, pending_audio[:n_feed]])
-                pending_audio = pending_audio[n_feed:]
+                fed_audio = pending_audio.pop(n_feed)
+                chunk = np.concatenate([left_pad, fed_audio])
                 n_audio_samples_fed += n_feed
 
                 mel, audio_tail = log_mel_spectrogram_step(chunk, audio_tail)
@@ -174,7 +276,7 @@ def stream_transcribe(
                 )
                 if new_embeds is not None:
                     mx.eval(new_embeds)
-                    audio_embeds = new_embeds
+                    audio_embeds.append(new_embeds)
                 first_cycle = False
 
             elif not first_cycle and len(pending_audio) >= SAMPLES_PER_TOKEN:
@@ -182,8 +284,7 @@ def stream_transcribe(
                 n_feed = (
                     (len(pending_audio) // SAMPLES_PER_TOKEN) * SAMPLES_PER_TOKEN
                 )
-                chunk = pending_audio[:n_feed]
-                pending_audio = pending_audio[n_feed:]
+                chunk = pending_audio.pop(n_feed)
                 n_audio_samples_fed += n_feed
 
                 mel, audio_tail = log_mel_spectrogram_step(chunk, audio_tail)
@@ -194,21 +295,18 @@ def stream_transcribe(
                 )
                 if new_embeds is not None:
                     mx.eval(new_embeds)
-                    if audio_embeds is not None:
-                        audio_embeds = mx.concatenate([audio_embeds, new_embeds])
-                    else:
-                        audio_embeds = new_embeds
+                    audio_embeds.append(new_embeds)
 
-            if audio_embeds is None:
+            if len(audio_embeds) == 0:
                 time.sleep(0.02)
                 continue
 
             # How many undecoded embeddings are safe to decode
             safe_total = (
-                N_LEFT_PAD_TOKENS + n_audio_samples_fed // SAMPLES_PER_TOKEN
+                DEFAULT_LEFT_PAD_TOKENS + n_audio_samples_fed // SAMPLES_PER_TOKEN
             )
             n_decodable = min(
-                audio_embeds.shape[0], safe_total - n_total_decoded
+                len(audio_embeds), safe_total - n_total_decoded
             )
 
             if n_decodable <= 0:
@@ -217,13 +315,14 @@ def stream_transcribe(
 
             if not prefilled:
                 # Need prefix_len total positions for prefill
-                if n_total_decoded + audio_embeds.shape[0] < prefix_len:
+                if n_total_decoded + len(audio_embeds) < prefix_len:
                     time.sleep(0.02)
                     continue
 
                 cache = [RotatingKVCache(sliding_window) for _ in range(n_layers)]
 
-                prefix_embeds = text_embeds + audio_embeds[:prefix_len]
+                prefix_audio = audio_embeds.pop(prefix_len)
+                prefix_embeds = text_embeds + prefix_audio
                 prefix_embeds = prefix_embeds[None, :, :]
 
                 logits = model.decode(prefix_embeds, t_cond, "causal", cache)
@@ -232,14 +331,12 @@ def stream_transcribe(
                 y = sample(logits)
                 mx.async_eval(y)
 
-                # Trim consumed prefix
-                audio_embeds = audio_embeds[prefix_len:]
                 n_total_decoded = prefix_len
                 prefilled = True
 
                 # Recompute decodable after consuming prefix
                 n_decodable = min(
-                    audio_embeds.shape[0], safe_total - n_total_decoded
+                    len(audio_embeds), safe_total - n_total_decoded
                 )
 
             if n_decodable <= 0:
@@ -247,14 +344,9 @@ def stream_transcribe(
                 continue
 
             # Decode new positions
-            n_consumed, hit_eos = decode_steps(audio_embeds, n_decodable)
+            decode_embeds = audio_embeds.pop(n_decodable)
+            n_consumed, hit_eos = decode_steps(decode_embeds, n_decodable)
             n_total_decoded += n_consumed
-
-            # Trim consumed embeddings
-            if audio_embeds.shape[0] > n_consumed:
-                audio_embeds = audio_embeds[n_consumed:]
-            else:
-                audio_embeds = None
 
             if hit_eos:
                 reset_all_state()
@@ -271,14 +363,17 @@ def stream_transcribe(
         # pipeline, then decode all remaining positions.
         if cache is not None and y is not None:
             with lock:
-                final_audio = audio_buf
-                audio_buf = np.zeros(0, dtype=np.float32)
+                final_chunks = list(callback_chunks)
+                callback_chunks.clear()
 
-            pending_audio = np.append(pending_audio, final_audio)
+            pending_audio.append_many(final_chunks)
             right_pad = np.zeros(
-                N_RIGHT_PAD_TOKENS * SAMPLES_PER_TOKEN, dtype=np.float32
+                DEFAULT_RIGHT_PAD_TOKENS * SAMPLES_PER_TOKEN, dtype=np.float32
             )
-            flush_chunk = np.concatenate([pending_audio, right_pad])
+            if len(pending_audio) > 0:
+                flush_chunk = np.concatenate([pending_audio.pop(len(pending_audio)), right_pad])
+            else:
+                flush_chunk = right_pad
             mel, audio_tail = log_mel_spectrogram_step(flush_chunk, audio_tail)
             new_embeds, conv1_tail, conv2_tail, encoder_cache, ds_buf = (
                 model.encode_step(
@@ -287,12 +382,10 @@ def stream_transcribe(
             )
             if new_embeds is not None:
                 mx.eval(new_embeds)
-                if audio_embeds is not None:
-                    audio_embeds = mx.concatenate([audio_embeds, new_embeds])
-                else:
-                    audio_embeds = new_embeds
-            if audio_embeds is not None:
-                decode_steps(audio_embeds, audio_embeds.shape[0])
+                audio_embeds.append(new_embeds)
+            if len(audio_embeds) > 0:
+                remaining = audio_embeds.pop(len(audio_embeds))
+                decode_steps(remaining, remaining.shape[0])
 
         # Flush last pending token
         if y is not None:
@@ -320,9 +413,16 @@ def main():
         default=0.0,
         help="Sampling temperature (0 = greedy)",
     )
+    parser.add_argument(
+        "--sliding-window",
+        type=int,
+        default=None,
+        help="Decoder KV sliding window size (defaults to model config or 8192)",
+    )
     args = parser.parse_args()
 
     stream_transcribe(
         model_path=args.model,
         temperature=args.temp,
+        sliding_window=args.sliding_window,
     )

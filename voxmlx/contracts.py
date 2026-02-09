@@ -42,13 +42,18 @@ REMAP_PATTERNS = [
     # Language model output norm
     (r"norm\.weight", r"language_model.norm.weight"),
 ]
+_PREFIX_RE = re.compile(r"^(mm_streams_embeddings\.embedding_module|mm_whisper_embeddings)\.")
+_COMPILED_REMAP_PATTERNS = [
+    (re.compile(f"^{pattern}$"), replacement)
+    for pattern, replacement in REMAP_PATTERNS
+]
 
 
 def remap_weight_name(name: str) -> str | None:
     """Remap source checkpoint names to voxmlx model names."""
-    name = re.sub(r"^(mm_streams_embeddings\.embedding_module|mm_whisper_embeddings)\.", "", name)
-    for pattern, replacement in REMAP_PATTERNS:
-        new_name, n = re.subn(f"^{pattern}$", replacement, name)
+    name = _PREFIX_RE.sub("", name)
+    for pattern, replacement in _COMPILED_REMAP_PATTERNS:
+        new_name, n = pattern.subn(replacement, name)
         if n > 0:
             return new_name
     return None

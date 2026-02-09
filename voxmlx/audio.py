@@ -1,8 +1,11 @@
 import math
+import os
 
 import mlx.core as mx
 import numpy as np
 import soundfile as sf
+
+from .constants import DEFAULT_LEFT_PAD_TOKENS, DEFAULT_RIGHT_PAD_TOKENS
 
 SAMPLE_RATE = 16000
 N_FFT = 400
@@ -17,7 +20,8 @@ def load_audio(path: str) -> np.ndarray:
     if audio.ndim > 1:
         audio = audio.mean(axis=1)
     if sr != SAMPLE_RATE:
-        # Simple linear interpolation resample
+        # Simple linear interpolation resample. This is lightweight but does not
+        # include an anti-aliasing filter, so downsampling quality is limited.
         duration = len(audio) / sr
         n_out = int(duration * SAMPLE_RATE)
         indices = np.linspace(0, len(audio) - 1, n_out)
@@ -31,8 +35,8 @@ def load_audio(path: str) -> np.ndarray:
 
 def pad_audio(
     audio: np.ndarray,
-    n_left_pad_tokens: int = 32,
-    n_right_pad_tokens: int = 17,
+    n_left_pad_tokens: int = DEFAULT_LEFT_PAD_TOKENS,
+    n_right_pad_tokens: int = DEFAULT_RIGHT_PAD_TOKENS,
 ) -> np.ndarray:
     left_pad = n_left_pad_tokens * SAMPLES_PER_TOKEN
     right_align = (SAMPLES_PER_TOKEN - (len(audio) % SAMPLES_PER_TOKEN)) % SAMPLES_PER_TOKEN
@@ -94,6 +98,7 @@ _MEL_FILTERS = None
 _STFT_WINDOW = None
 _DFT_REAL = None
 _DFT_IMAG = None
+_STFT_BACKEND = os.getenv("VOXMLX_STFT_BACKEND", "dft").strip().lower()
 
 
 def _get_mel_filters() -> mx.array:
@@ -123,43 +128,25 @@ def _get_dft_basis() -> tuple[mx.array, mx.array]:
     return _DFT_REAL, _DFT_IMAG
 
 
+def _power_spectrum(frames: mx.array, drop_last_frame: bool) -> mx.array:
+    if _STFT_BACKEND == "fft" and hasattr(mx, "fft"):
+        spec = mx.fft.rfft(frames, axis=-1)
+        magnitudes = mx.real(spec * mx.conj(spec))
+    else:
+        dft_real, dft_imag = _get_dft_basis()
+        spec_real = frames @ dft_real.T
+        spec_imag = frames @ dft_imag.T
+        magnitudes = spec_real ** 2 + spec_imag ** 2
+
+    if drop_last_frame and magnitudes.shape[0] > 0:
+        return magnitudes[:-1]
+    return magnitudes
+
+
 def log_mel_spectrogram(audio: np.ndarray) -> mx.array:
-    audio_mx = mx.array(audio)
-
-    window = _get_stft_window()
-
-    # Pad audio so we get the same number of frames as torch.stft
-    pad_len = N_FFT // 2
-    audio_mx = mx.pad(audio_mx, [(pad_len, pad_len)])
-
-    # Frame the signal
-    n_frames = 1 + (audio_mx.shape[0] - N_FFT) // HOP_LENGTH
-    # Build frame indices
-    t = mx.arange(N_FFT)[None, :]  # [1, N_FFT]
-    starts = (mx.arange(n_frames) * HOP_LENGTH)[:, None]  # [n_frames, 1]
-    indices = starts + t  # [n_frames, N_FFT]
-    frames = audio_mx[indices] * window[None, :]  # [n_frames, N_FFT]
-
-    dft_real, dft_imag = _get_dft_basis()
-    spec_real = frames @ dft_real.T  # [n_frames, n_freqs]
-    spec_imag = frames @ dft_imag.T  # [n_frames, n_freqs]
-
-    # Power spectrum, drop last frame to match torch.stft(...)[..., :-1]
-    magnitudes = (spec_real[:-1] ** 2 + spec_imag[:-1] ** 2)  # [n_frames-1, n_freqs]
-
-    # Mel filterbank
-    mel_filters = _get_mel_filters()  # [n_mels, n_freqs]
-    mel_spec = magnitudes @ mel_filters.T  # [n_frames-1, n_mels]
-
-    # Log scale
-    log_spec = mx.log10(mx.maximum(mel_spec, 1e-10))
-
-    # Normalize
-    log_spec = mx.maximum(log_spec, GLOBAL_LOG_MEL_MAX - 8.0)
-    log_spec = (log_spec + 4.0) / 4.0
-
-    # Transpose to [n_mels, T]
-    return log_spec.T
+    # Keep offline and streaming paths feature-compatible.
+    mel, _ = log_mel_spectrogram_step(audio, audio_tail=None)
+    return mel
 
 
 def log_mel_spectrogram_step(
@@ -169,14 +156,16 @@ def log_mel_spectrogram_step(
 
     Args:
         audio_chunk: new audio samples (float32 numpy)
-        audio_tail: last N_FFT - HOP_LENGTH = 240 samples from previous call,
-                    or None for first call (adds STFT left padding instead)
+        audio_tail: overlap samples from previous call, or None for first call
+                    (adds STFT left padding instead)
 
     Returns:
         (mel, new_tail) where mel is [n_mels, n_new_frames] and
-        new_tail is the last 240 samples for the next call.
+        new_tail is the overlap state for the next call.
     """
-    tail_len = N_FFT - HOP_LENGTH  # 240
+    # With initial left padding and hop framing, we need to retain enough
+    # history to preserve frame-phase continuity across chunk boundaries.
+    tail_len = N_FFT - ((N_FFT // 2) % HOP_LENGTH)
 
     if audio_tail is not None:
         combined = np.concatenate([audio_tail, audio_chunk])
@@ -204,12 +193,8 @@ def log_mel_spectrogram_step(
     indices = starts + t
     frames = audio_mx[indices] * window[None, :]
 
-    dft_real, dft_imag = _get_dft_basis()
-    spec_real = frames @ dft_real.T
-    spec_imag = frames @ dft_imag.T
-
     # Power spectrum (no [:-1] frame drop — incremental produces exact frames)
-    magnitudes = spec_real ** 2 + spec_imag ** 2
+    magnitudes = _power_spectrum(frames, drop_last_frame=False)
 
     # Mel filterbank
     mel_filters = _get_mel_filters()

@@ -2,6 +2,7 @@ import mlx.core as mx
 
 from .audio import load_audio, log_mel_spectrogram, pad_audio
 from .cache import RotatingKVCache
+from .constants import DEFAULT_CLEAR_CACHE_INTERVAL, DEFAULT_DECODER_SLIDING_WINDOW
 from .model import VoxtralRealtime
 
 
@@ -12,8 +13,10 @@ def generate(
     n_delay_tokens: int,
     temperature: float = 0.0,
     eos_token_id: int = 2,
-    sliding_window: int = 8192,
+    sliding_window: int | None = None,
 ) -> list[int]:
+    if sliding_window is None:
+        sliding_window = DEFAULT_DECODER_SLIDING_WINDOW
     # 1. Load audio, pad for streaming, and compute mel spectrogram
     audio = load_audio(audio_path)
     audio = pad_audio(audio)
@@ -68,13 +71,9 @@ def generate(
             break
         output_tokens.append(token_id)
 
-        if pos % 2048 == 0:
+        if pos % DEFAULT_CLEAR_CACHE_INTERVAL == 0:
             mx.clear_cache()
 
         y = next_y
-
-    # Check the last token
-    if output_tokens and output_tokens[-1] == eos_token_id:
-        output_tokens = output_tokens[:-1]
 
     return output_tokens

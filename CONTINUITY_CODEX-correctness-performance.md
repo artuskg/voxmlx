@@ -22,10 +22,11 @@ Key decisions:
   - `token_error_ratio`: token-level Levenshtein / GT tokens
 - Accept quality if deviation does not worsen versus baseline while speed improves.
 - User requirement: all test/benchmark runs must be executed sequentially (never in parallel).
+- User preference: suppress sync reminders unless there are new changes to global AGENTS.md or skills.
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: shorten reference audio to 10 minutes and update matrix/workflow paths, then push.
+- Now: integrate consolidated code-review fixes and record per-issue status in ledger.
 - Next: run updated 10-minute matrix on Mac Mini for 10x repeats per version.
 
 Done:
@@ -54,15 +55,34 @@ Done:
   - `perf/version_matrix.json`: `clip_seconds=600`, matrix name `voxtral_clip600`, local reference-audio paths.
 - Updated docs/runbook examples to 10-minute reference audio workflow.
 - Validated `scripts/run_version_matrix.py` with `--dry-run` against updated matrix.
+- Consolidated review issue status (current pass):
+  - #1 (P0) Fixed: encoder cache now uses `self.encoder.sliding_window` in `voxmlx/model.py`.
+  - #2 (P0) Fixed: `_update_concat` trim math corrected for `S>1` and bounded assertions added in `voxmlx/cache.py`.
+  - #3 (P0) Fixed: offline `encode()` now trims trailing frames (`[:-1]`, `[:-remainder]`) in `voxmlx/model.py`.
+  - #4 Fixed: removed unreachable EOS tail check in `voxmlx/generate.py`.
+  - #5 Fixed: callback buffer no longer uses `np.append`; now chunk queue (`AudioSampleQueue`) in `voxmlx/stream.py`.
+  - #6 Fixed: streaming embeddings now use `EmbeddingQueue` (chunked) instead of repeated `mx.concatenate` growth in `voxmlx/stream.py`.
+  - #7 Addressed with guard: optional FFT backend via `VOXMLX_STFT_BACKEND=fft` in `voxmlx/audio.py`; default remains DFT for compatibility.
+  - #8 Fixed + guarded: offline and streaming mel paths are feature-compatible; overlap state corrected and optional runtime test added (`tests/test_mlx_runtime_optional.py`).
+  - #9 Addressed: resampling limitation documented in `voxmlx/audio.py`.
+  - #10 Partially addressed: streaming state complexity reduced with queue classes; full `StreamingTranscriber` class refactor deferred.
+  - #11 Fixed: reusable `Transcriber` API added in `voxmlx/__init__.py`; `transcribe()` can reuse preloaded bundle.
+  - #12 Partially fixed: shared constants centralized in `voxmlx/constants.py` and wired across audio/prompt/stream defaults.
+  - #13 Fixed: remap regex patterns precompiled in `voxmlx/contracts.py`.
+  - #14 Fixed: decoder `sliding_window` is now configurable through API/CLI and defaults to config value when available.
+- Validation from this pass:
+  - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
+  - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
 
 Now:
-- Commit and push 10-minute reference audio + matrix/docs updates.
+- Commit/push consolidated review fixes and updated ledger.
 
 Next:
-- Push updated reference clips and matrix to origin, then execute on Mac Mini.
+- Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
+- UNCONFIRMED: whether to prioritize full `StreamingTranscriber` class refactor (#10) in this branch.
 
 Working set (files/ids/commands):
 - `scripts/audio_eval.py`
@@ -75,6 +95,8 @@ Working set (files/ids/commands):
 - `scripts/run_version_matrix.py`
 - `perf/version_matrix.json`
 - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --dry-run`
+- `voxmlx/constants.py`
+- `tests/test_mlx_runtime_optional.py`
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
 
