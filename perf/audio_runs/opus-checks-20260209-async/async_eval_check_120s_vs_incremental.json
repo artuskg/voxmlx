@@ -1,0 +1,15 @@
+{
+  "clip_seconds": 120,
+  "token_counts": {
+    "incremental": 1510,
+    "noninc_async_on": 1510,
+    "noninc_async_off": 1510
+  },
+  "noninc_on_equals_off": true,
+  "first_div_noninc_on_vs_incremental": 50,
+  "first_div_noninc_off_vs_incremental": 50,
+  "elapsed_seconds": {
+    "noninc_async_on": 26.710609290981665,
+    "noninc_async_off": 32.84920841699932
+  }
+}

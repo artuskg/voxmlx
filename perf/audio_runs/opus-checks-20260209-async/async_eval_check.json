@@ -1,0 +1,13 @@
+{
+  "clip_seconds": 30,
+  "async_on": {
+    "elapsed_seconds": 7.164877334027551,
+    "token_count": 385
+  },
+  "async_off": {
+    "elapsed_seconds": 5.526697334018536,
+    "token_count": 385
+  },
+  "equal_tokens": true,
+  "first_token_divergence_index": null
+}

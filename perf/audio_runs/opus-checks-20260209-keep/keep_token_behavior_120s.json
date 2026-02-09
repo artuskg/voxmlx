@@ -1,0 +1,519 @@
+{
+  "source_run_dir": "perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z",
+  "non_incremental": {
+    "token_count": 1510,
+    "eos_count": 0,
+    "special_count": 1271,
+    "special_ratio": 0.8417218543046358,
+    "longest_same_token_run": 277,
+    "longest_special_run": 277,
+    "top_tokens": [
+      {
+        "token_id": 32,
+        "count": 1134,
+        "ratio": 0.7509933774834437,
+        "text_keep": "[STREAMING_PAD]",
+        "is_special": true
+      },
+      {
+        "token_id": 33,
+        "count": 137,
+        "ratio": 0.09072847682119205,
+        "text_keep": "[STREAMING_WORD]",
+        "is_special": true
+      },
+      {
+        "token_id": 1046,
+        "count": 15,
+        "ratio": 0.009933774834437087,
+        "text_keep": ".",
+        "is_special": false
+      },
+      {
+        "token_id": 2118,
+        "count": 9,
+        "ratio": 0.005960264900662252,
+        "text_keep": " app",
+        "is_special": false
+      },
+      {
+        "token_id": 1317,
+        "count": 9,
+        "ratio": 0.005960264900662252,
+        "text_keep": " to",
+        "is_special": false
+      },
+      {
+        "token_id": 1395,
+        "count": 6,
+        "ratio": 0.003973509933774834,
+        "text_keep": " is",
+        "is_special": false
+      },
+      {
+        "token_id": 1636,
+        "count": 6,
+        "ratio": 0.003973509933774834,
+        "text_keep": " you",
+        "is_special": false
+      },
+      {
+        "token_id": 1278,
+        "count": 5,
+        "ratio": 0.0033112582781456954,
+        "text_keep": " the",
+        "is_special": false
+      },
+      {
+        "token_id": 1044,
+        "count": 5,
+        "ratio": 0.0033112582781456954,
+        "text_keep": ",",
+        "is_special": false
+      },
+      {
+        "token_id": 1321,
+        "count": 5,
+        "ratio": 0.0033112582781456954,
+        "text_keep": " and",
+        "is_special": false
+      },
+      {
+        "token_id": 1362,
+        "count": 4,
+        "ratio": 0.0026490066225165563,
+        "text_keep": " I",
+        "is_special": false
+      },
+      {
+        "token_id": 6185,
+        "count": 4,
+        "ratio": 0.0026490066225165563,
+        "text_keep": "'re",
+        "is_special": false
+      }
+    ],
+    "special_ratio_trend_64tok": [
+      {
+        "start": 0,
+        "end": 63,
+        "special_ratio": 0.703125
+      },
+      {
+        "start": 64,
+        "end": 127,
+        "special_ratio": 0.65625
+      },
+      {
+        "start": 128,
+        "end": 191,
+        "special_ratio": 0.765625
+      },
+      {
+        "start": 192,
+        "end": 255,
+        "special_ratio": 0.75
+      },
+      {
+        "start": 256,
+        "end": 319,
+        "special_ratio": 0.703125
+      },
+      {
+        "start": 320,
+        "end": 383,
+        "special_ratio": 0.65625
+      },
+      {
+        "start": 384,
+        "end": 447,
+        "special_ratio": 0.59375
+      },
+      {
+        "start": 448,
+        "end": 511,
+        "special_ratio": 0.703125
+      },
+      {
+        "start": 512,
+        "end": 575,
+        "special_ratio": 0.75
+      },
+      {
+        "start": 576,
+        "end": 639,
+        "special_ratio": 1.0
+      },
+      {
+        "start": 640,
+        "end": 703,
+        "special_ratio": 0.875
+      },
+      {
+        "start": 704,
+        "end": 767,
+        "special_ratio": 0.890625
+      },
+      {
+        "start": 768,
+        "end": 831,
+        "special_ratio": 1.0
+      },
+      {
+        "start": 832,
+        "end": 895,
+        "special_ratio": 1.0
+      },
+      {
+        "start": 896,
+        "end": 959,
+        "special_ratio": 1.0
+      },
+      {
+        "start": 960,
+        "end": 1023,
+        "special_ratio": 0.875
+      },
+      {
+        "start": 1024,
+        "end": 1087,
+        "special_ratio": 0.828125
+      },
+      {
+        "start": 1088,
+        "end": 1151,
+        "special_ratio": 0.828125
+      },
+      {
+        "start": 1152,
+        "end": 1215,
+        "special_ratio": 0.71875
+      },
+      {
+        "start": 1216,
+        "end": 1279,
+        "special_ratio": 0.96875
+      },
+      {
+        "start": 1280,
+        "end": 1343,
+        "special_ratio": 1.0
+      },
+      {
+        "start": 1344,
+        "end": 1407,
+        "special_ratio": 1.0
+      },
+      {
+        "start": 1408,
+        "end": 1471,
+        "special_ratio": 1.0
+      },
+      {
+        "start": 1472,
+        "end": 1509,
+        "special_ratio": 1.0
+      }
+    ],
+    "first_40_tokens_keep": [
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " Most",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " apps",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " fail",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " before",
+      " they",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " launch",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " because",
+      " the",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " idea",
+      " is",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " not",
+      "[STREAMING_PAD]"
+    ]
+  },
+  "incremental": {
+    "token_count": 1510,
+    "eos_count": 0,
+    "special_count": 1110,
+    "special_ratio": 0.7350993377483444,
+    "longest_same_token_run": 38,
+    "longest_special_run": 39,
+    "top_tokens": [
+      {
+        "token_id": 32,
+        "count": 877,
+        "ratio": 0.580794701986755,
+        "text_keep": "[STREAMING_PAD]",
+        "is_special": true
+      },
+      {
+        "token_id": 33,
+        "count": 233,
+        "ratio": 0.1543046357615894,
+        "text_keep": "[STREAMING_WORD]",
+        "is_special": true
+      },
+      {
+        "token_id": 1046,
+        "count": 24,
+        "ratio": 0.015894039735099338,
+        "text_keep": ".",
+        "is_special": false
+      },
+      {
+        "token_id": 1317,
+        "count": 21,
+        "ratio": 0.01390728476821192,
+        "text_keep": " to",
+        "is_special": false
+      },
+      {
+        "token_id": 2118,
+        "count": 11,
+        "ratio": 0.00728476821192053,
+        "text_keep": " app",
+        "is_special": false
+      },
+      {
+        "token_id": 1395,
+        "count": 10,
+        "ratio": 0.006622516556291391,
+        "text_keep": " is",
+        "is_special": false
+      },
+      {
+        "token_id": 1044,
+        "count": 9,
+        "ratio": 0.005960264900662252,
+        "text_keep": ",",
+        "is_special": false
+      },
+      {
+        "token_id": 1362,
+        "count": 8,
+        "ratio": 0.005298013245033113,
+        "text_keep": " I",
+        "is_special": false
+      },
+      {
+        "token_id": 4670,
+        "count": 8,
+        "ratio": 0.005298013245033113,
+        "text_keep": " going",
+        "is_special": false
+      },
+      {
+        "token_id": 1321,
+        "count": 8,
+        "ratio": 0.005298013245033113,
+        "text_keep": " and",
+        "is_special": false
+      },
+      {
+        "token_id": 1636,
+        "count": 8,
+        "ratio": 0.005298013245033113,
+        "text_keep": " you",
+        "is_special": false
+      },
+      {
+        "token_id": 1261,
+        "count": 8,
+        "ratio": 0.005298013245033113,
+        "text_keep": " a",
+        "is_special": false
+      }
+    ],
+    "special_ratio_trend_64tok": [
+      {
+        "start": 0,
+        "end": 63,
+        "special_ratio": 0.71875
+      },
+      {
+        "start": 64,
+        "end": 127,
+        "special_ratio": 0.640625
+      },
+      {
+        "start": 128,
+        "end": 191,
+        "special_ratio": 0.765625
+      },
+      {
+        "start": 192,
+        "end": 255,
+        "special_ratio": 0.75
+      },
+      {
+        "start": 256,
+        "end": 319,
+        "special_ratio": 0.703125
+      },
+      {
+        "start": 320,
+        "end": 383,
+        "special_ratio": 0.65625
+      },
+      {
+        "start": 384,
+        "end": 447,
+        "special_ratio": 0.609375
+      },
+      {
+        "start": 448,
+        "end": 511,
+        "special_ratio": 0.703125
+      },
+      {
+        "start": 512,
+        "end": 575,
+        "special_ratio": 0.75
+      },
+      {
+        "start": 576,
+        "end": 639,
+        "special_ratio": 0.828125
+      },
+      {
+        "start": 640,
+        "end": 703,
+        "special_ratio": 0.734375
+      },
+      {
+        "start": 704,
+        "end": 767,
+        "special_ratio": 0.578125
+      },
+      {
+        "start": 768,
+        "end": 831,
+        "special_ratio": 0.625
+      },
+      {
+        "start": 832,
+        "end": 895,
+        "special_ratio": 0.828125
+      },
+      {
+        "start": 896,
+        "end": 959,
+        "special_ratio": 0.828125
+      },
+      {
+        "start": 960,
+        "end": 1023,
+        "special_ratio": 0.828125
+      },
+      {
+        "start": 1024,
+        "end": 1087,
+        "special_ratio": 0.8125
+      },
+      {
+        "start": 1088,
+        "end": 1151,
+        "special_ratio": 0.796875
+      },
+      {
+        "start": 1152,
+        "end": 1215,
+        "special_ratio": 0.703125
+      },
+      {
+        "start": 1216,
+        "end": 1279,
+        "special_ratio": 0.71875
+      },
+      {
+        "start": 1280,
+        "end": 1343,
+        "special_ratio": 0.75
+      },
+      {
+        "start": 1344,
+        "end": 1407,
+        "special_ratio": 0.8125
+      },
+      {
+        "start": 1408,
+        "end": 1471,
+        "special_ratio": 0.734375
+      },
+      {
+        "start": 1472,
+        "end": 1509,
+        "special_ratio": 0.7894736842105263
+      }
+    ],
+    "first_40_tokens_keep": [
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " Most",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " apps",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " fail",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " before",
+      " they",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " launch",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " because",
+      " the",
+      "[STREAMING_PAD]",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " idea",
+      " is",
+      "[STREAMING_PAD]",
+      "[STREAMING_WORD]",
+      " not",
+      "[STREAMING_PAD]"
+    ]
+  }
+}

@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: focused token-level step-through at divergence index (`50`) implemented and exercised.
-- Next: use focused trace to validate encoder-path fixes (expect argmax agreement and first meaningful divergence to move rightward or disappear).
+- Now: Opus hypothesis checks completed; integrating conclusions into next debugging step.
+- Next: prioritize encoder path equivalence fixes (offline vs incremental encode math/order), then re-run focused tracer expecting first divergence to move rightward.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -194,6 +194,32 @@ Done:
   - post-push `git status --short`: clean for tracked files; remaining untracked prior artifacts:
     - `perf/audio_runs/semantic-compare-dft-vs-fft-20260209T143909Z/`
     - `perf/audio_runs/trace-noninc-vs-inc-20260209T151236Z/`
+- User decision on unexpected files:
+  - leave untouched and continue work.
+- Additional Opus-driven checks (2026-02-09):
+  - Async-eval race hypothesis:
+    - 30s check (`generate` async on vs async disabled): token streams identical (`385` tokens each, divergence `None`).
+      - artifact: `perf/audio_runs/opus-checks-20260209-async/async_eval_check.json`
+    - 120s check versus incremental:
+      - non-incremental async-on and async-off streams identical (`1510` tokens each)
+      - first divergence vs incremental unchanged at token `50` in both cases
+      - artifact: `perf/audio_runs/opus-checks-20260209-async/async_eval_check_120s_vs_incremental.json`
+    - conclusion: `mx.async_eval` is not the source of the 50-token divergence.
+  - Encoder numeric drift hypothesis:
+    - compared non-incremental vs incremental encoder embeddings on 120s clip:
+      - shapes match: `(1548, 3072)` each
+      - max abs diff grows early (`>1e-2` by position `2`, `>0.1` by `18`, `>1.0` by `48`)
+      - near divergence region (positions `86-90`): max abs diffs ~`0.063` to `0.25`
+      - global max abs diff: `4.375`
+      - artifact: `perf/audio_runs/opus-checks-20260209-encoder/encoder_drift_120s.json`
+    - conclusion: strong support that encoder-path numerical mismatch is the primary trigger for token-50 argmax flip/cascade.
+  - KEEP-token pattern hypothesis:
+    - no EOS collapse (`eos_count=0` both)
+    - both streams heavily use special tokens, but non-incremental is materially more PAD-heavy:
+      - non-incremental `[STREAMING_PAD]` ratio `0.751`, longest special run `277`
+      - incremental `[STREAMING_PAD]` ratio `0.581`, longest special run `39`
+      - artifact: `perf/audio_runs/opus-checks-20260209-keep/keep_token_behavior_120s.json`
+    - conclusion: collapse manifests as PAD-heavy behavior in non-incremental path, consistent with earlier divergence evidence.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -223,6 +249,7 @@ Next:
 - Add encoder offline-vs-incremental equivalence test coverage.
 - Investigate encoder cached attention alignment (`mask="causal"` with `q_len != k_len`) as primary suspect for contract failure.
 - Use focused tracer around first divergence while testing encoder-alignment fixes; success criterion is stable argmax agreement at/after index 50 on the 120s diagnostic run.
+- Focus immediate debugging on why offline `encode()` and incremental `encode_step()` diverge numerically so early (operation ordering / masking path), since async and EOS-collapse hypotheses were falsified.
 - Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
 - Rebaseline existing perf run deviation metrics against updated ground truth.
 - Optionally regenerate with identical timing conditions on a quieter machine for cleaner speed comparison.
@@ -261,6 +288,10 @@ Working set (files/ids/commands):
 - `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/non_incremental_focus_trace.json`
 - `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/incremental_focus_trace.json`
 - `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/focus_pairwise.json`
+- `perf/audio_runs/opus-checks-20260209-async/async_eval_check.json`
+- `perf/audio_runs/opus-checks-20260209-async/async_eval_check_120s_vs_incremental.json`
+- `perf/audio_runs/opus-checks-20260209-encoder/encoder_drift_120s.json`
+- `perf/audio_runs/opus-checks-20260209-keep/keep_token_behavior_120s.json`
 - `perf/ground_truth_mono.txt`
 - `perf/audio_runs/*/metrics.json`
 - `perf/audio_runs/*/*_transcript.txt`
