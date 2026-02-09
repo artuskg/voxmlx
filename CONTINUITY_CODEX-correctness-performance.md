@@ -24,7 +24,7 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: finalize with rerun results recorded and pushed.
+- Now: report latest metric summary to user after ground-truth stability rerun.
 - Next: optional larger-window/full-file confirmation runs.
 
 Done:
