@@ -26,7 +26,7 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: commit/push KV cache + RoPE scaffold tests for future ring-buffer replacement.
+- Now: waiting for next step (reference gathering + ring-buffer implementation) with scaffold tests in place.
 - Next: gather external references and implement ring-buffer cache against scaffold contracts.
 
 Done:
@@ -90,7 +90,7 @@ Done:
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional tests.test_kv_cache_rope_scaffold_optional -v` -> pass.
 
 Now:
-- Commit and push scaffold tests (no implementation changes to cache architecture).
+- Hold for next instruction; scaffold tests are committed/pushed.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -125,6 +125,7 @@ Working set (files/ids/commands):
 - Optimized commit: `ea25661`
 - Streaming class-refactor commit: `cce41e1`
 - Constants/config-validation follow-up commit: `dc994b1`
+- KV/RoPE scaffold tests commit: `b4c54c7`
 
 Performance results table:
 | Label | Change summary | Commit | Model | Config | Audio | Time (s) | Speedup vs baseline | Deviation vs GT (norm edit / token err) | Notes |
