@@ -7,9 +7,12 @@ Bug: deterministic non-incremental vs incremental divergence at token 50 (encode
 - Adds original-author-commit reproduction artifacts proving issue predates local changes:
   - `perf/audio_runs/commit-compare-e6d193e-20260209T000000Z/comparison.json`
   - `perf/audio_runs/commit-compare-e6d193e-20s-20260209T000000Z/comparison.json`
+- Adds a committed 20s fixture used by the report's token-50 claim:
+  - `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_20s.wav`
 
 ## Problem statement
 On the same model/audio/settings, non-incremental file decode (`generate.py` with `model.encode`) diverges from incremental decode (`encode_step`) at output token index 50.
+This index is documented against the included 20s fixture (and may differ for different audio).
 
 ## Repro
 See:

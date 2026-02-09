@@ -3,11 +3,13 @@
 ## Summary
 On Voxtral realtime MLX inference, non-incremental file decoding (`generate.py` path using `model.encode`) and incremental decoding (`encode_step` path) diverge deterministically at output token index **50** on the same audio/model/settings.
 
+Important: the `50` index is tied to the included 20s fixture below and may differ for other audio.
+
 This appears to be an **encoder transformer full-sequence vs cached-history semantic mismatch**, not a decoder sliding-window issue.
 
 ## Scope
 - Model: `mlx-community/Voxtral-Mini-4B-Realtime-6bit`
-- Audio fixture: `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav`
+- Audio fixture (included in this PR): `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_20s.wav`
 - Temperature: `0.0` (greedy)
 - STFT backend: `dft` (for parity runs)
 
@@ -18,26 +20,55 @@ The divergence was reproduced on both:
 
 So this is not introduced by recent local changes.
 
-## Minimal Repro
-Run tracer (120s clip):
-
+## Minimal Repro (self-contained, 20s fixture)
 ```bash
-VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python \
-  scripts/trace_nonincremental_vs_incremental.py \
-  --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav \
-  --clip-seconds 120
-```
+PYTHONPATH=. .venv313/bin/python - <<'PY'
+from pathlib import Path
+import mlx.core as mx
+from voxmlx import load_model, _build_prompt_tokens
+from voxmlx.audio import load_audio, pad_audio, log_mel_spectrogram, log_mel_spectrogram_step, SAMPLES_PER_TOKEN
+from voxmlx.cache import RotatingKVCache
 
-Focused view around first mismatch:
+def first_diff(a,b):
+    for i,(x,y) in enumerate(zip(a,b)):
+        if x!=y: return i
+    return None if len(a)==len(b) else min(len(a),len(b))
 
-```bash
-VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python \
-  scripts/trace_nonincremental_vs_incremental.py \
-  --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav \
-  --clip-seconds 120 \
-  --focus-token-index 50 \
-  --focus-window 2 \
-  --trace-topk 8
+def inc_embeds(model, audio_padded):
+    at=ct1=ct2=ec=ds=None
+    parts=[]
+    for i in range(0,len(audio_padded),SAMPLES_PER_TOKEN):
+        mel,at=log_mel_spectrogram_step(audio_padded[i:i+SAMPLES_PER_TOKEN],at)
+        out,ct1,ct2,ec,ds=model.encode_step(mel,ct1,ct2,ec,ds)
+        if out is not None and out.shape[0]>0: parts.append(out)
+    return mx.concatenate(parts,axis=0)
+
+def decode(model, embeds, prompt_tokens, n_delay, eos, sw=8192):
+    t=model.time_embedding(mx.array([n_delay],dtype=mx.float32))
+    pre=len(prompt_tokens)
+    text=model.language_model.embed(mx.array([prompt_tokens]))[0]
+    cache=[RotatingKVCache(sw) for _ in range(len(model.language_model.layers))]
+    logits=model.decode((text+embeds[:pre])[None,:,:],t,"causal",cache)
+    mx.eval(logits,*[x for c in cache for x in (c.keys,c.values)])
+    y=mx.argmax(logits[0,-1:],axis=-1).squeeze()
+    out=[]
+    for pos in range(pre, embeds.shape[0]):
+        tok=model.language_model.embed(y.reshape(1,1))[0,0]
+        nlogits=model.decode((embeds[pos]+tok)[None,None,:],t,mask=None,cache=cache)
+        y_next=mx.argmax(nlogits[0,-1:],axis=-1).squeeze()
+        tid=int(y.item()); out.append(tid); y=y_next
+    return out
+
+model,sp,_=load_model("mlx-community/Voxtral-Mini-4B-Realtime-6bit")
+audio=load_audio("perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_20s.wav")
+audio=pad_audio(audio)
+prompt,n_delay=_build_prompt_tokens(sp)
+emb_non=model.encode(log_mel_spectrogram(audio))
+emb_inc=inc_embeds(model,audio)
+t_non=decode(model,emb_non,prompt,n_delay,sp.eos_id)
+t_inc=decode(model,emb_inc,prompt,n_delay,sp.eos_id)
+print("first_divergence", first_diff(t_non,t_inc))
+PY
 ```
 
 ## Key Observations
@@ -88,4 +119,3 @@ Encoder transformer full-sequence attention path (`encoder.__call__`) and cached
 2. Add a regression check: first divergence index vs incremental reference on 120s fixture should be `None` (or within strict tolerance).
 3. Investigate encoder full-vs-cached attention equivalence in layer 0 with history present (mask alignment / cached-history semantics in MLX SDPA).
 4. Optionally reintroduce a faster batch path only if it matches incremental-reference behavior on the same trace metrics.
-
