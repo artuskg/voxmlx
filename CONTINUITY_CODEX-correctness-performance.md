@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: added instrumentation plumbing for utilization diagnostics (`audio_eval` + `run_version_matrix`) and validated it with a short smoke run.
-- Next: run an instrumented real benchmark pass and inspect utilization summary (`metrics.json` + `system_samples.json`) before additional optimization work.
+- Now: incoming-only validation completed (new scaffold refs only) with preserved historical run artifacts/ledger metrics.
+- Next: decide whether to accept any incoming commit for promotion and whether to run repeats>1 for variance confirmation.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -75,6 +75,29 @@ Done:
   - `/Users/crabbotix/gitrepos/voxmlx/scripts/run_version_matrix.py`:
     - new flags: `--instrument`, `--instrument-sample-seconds` (propagated to audio-eval invocations).
   - Smoke validation succeeded (`instrumentation-smoke2`, clip=2s) and confirmed `default_device=Device(gpu, 0)`.
+- 2026-02-09: Updated `scripts/run_version_matrix.py` to support incoming-only execution without rerunning historical versions:
+  - `--version-ids <id1,id2,...>` selects a subset of matrix versions.
+  - `--skip-ground-truth-refresh` reuses existing `ground_truth_path` and skips baseline GT regeneration.
+  - Existing on-disk run artifacts and ledger numbers remain untouched.
+- 2026-02-09: Updated workflow docs for incoming-only runs:
+  - `/Users/crabbotix/gitrepos/voxmlx/RUNBOOK.md`
+  - `/Users/crabbotix/gitrepos/voxmlx/docs/correctness_performance.md`
+- 2026-02-09: Ran incoming-only sequential campaign (no baseline rerun):
+  - Command:
+    - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix /tmp/voxmlx_matrix_incoming.json --campaign incoming-only-clip600-r1 --repeats 1 --python /Users/crabbotix/gitrepos/voxmlx/.venv313/bin/python --version-ids incoming_59735f8,incoming_cce41e1,incoming_dc994b1 --skip-ground-truth-refresh`
+  - Output summary: `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r1/summary.json`
+  - Speed (total mono+stereo elapsed):
+    - `incoming_59735f8`: `326.170s`
+    - `incoming_cce41e1`: `324.110s`
+    - `incoming_dc994b1`: `323.481s`
+  - Text behavior:
+    - Mono transcript hash for all three runs: `c884ae4d490915b3d5bd6cfc61d1cb37485d58df1b4cd92404ec2fbb95348e5f` (matches `perf/ground_truth_mono.txt`)
+    - Stereo transcript hash for all three runs: `13e3ad011338077468d5281ac5507005be388b5de6999c439350a0eb18c409b9`
+    - Metrics unchanged across incoming versions: `mean_norm_edit_distance=0.020814`, `mean_token_error_ratio=0.031863`
+  - Relative to prior clip600 baseline reference (`317.512s` from `local-seq-clip600-r1`):
+    - `incoming_59735f8`: `-2.727%`
+    - `incoming_cce41e1`: `-2.078%`
+    - `incoming_dc994b1`: `-1.880%`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.

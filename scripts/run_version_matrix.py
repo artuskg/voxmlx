@@ -174,6 +174,16 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--instrument", action="store_true", help="Pass instrumentation flags to audio_eval")
     parser.add_argument("--instrument-sample-seconds", type=float, default=1.0)
+    parser.add_argument(
+        "--version-ids",
+        default=None,
+        help="Comma-separated version IDs to run (default: all IDs from matrix)",
+    )
+    parser.add_argument(
+        "--skip-ground-truth-refresh",
+        action="store_true",
+        help="Skip baseline ground-truth refresh and reuse existing ground-truth file",
+    )
     args = parser.parse_args()
 
     repo_root = Path(_git_output(Path.cwd(), ["rev-parse", "--show-toplevel"]))
@@ -186,7 +196,7 @@ def main() -> int:
     repeats = args.repeats if args.repeats is not None else int(matrix["repeats"])
     baseline_version_id = matrix["baseline_version_id"]
 
-    versions = [
+    all_versions = [
         VersionSpec(
             id=v["id"],
             ref=v["ref"],
@@ -195,8 +205,21 @@ def main() -> int:
         for v in matrix["versions"]
     ]
 
-    if baseline_version_id not in {v.id for v in versions}:
+    if baseline_version_id not in {v.id for v in all_versions}:
         raise ValueError(f"baseline_version_id {baseline_version_id!r} not found in versions")
+
+    selected_ids: set[str] | None = None
+    if args.version_ids:
+        selected_ids = {s.strip() for s in args.version_ids.split(",") if s.strip()}
+        if not selected_ids:
+            raise ValueError("--version-ids was provided but no IDs were parsed")
+        unknown_ids = sorted(selected_ids - {v.id for v in all_versions})
+        if unknown_ids:
+            raise ValueError(f"--version-ids contains unknown IDs: {unknown_ids}")
+
+    versions = [v for v in all_versions if selected_ids is None or v.id in selected_ids]
+    if not versions:
+        raise ValueError("No versions selected to run")
 
     python_exe = _resolve_path(str(args.python_exe), repo_root)
     audio_eval_script = _resolve_path(str(args.audio_eval_script), repo_root)
@@ -221,6 +244,13 @@ def main() -> int:
     for version in versions:
         print(f"  - {version.id}: ref={version.ref} desc={version.description}")
 
+    baseline_in_selection = baseline_version_id in {v.id for v in versions}
+    do_ground_truth_refresh = baseline_in_selection and not args.skip_ground_truth_refresh
+    if args.skip_ground_truth_refresh:
+        print("[matrix] ground-truth refresh skipped by flag")
+    elif not baseline_in_selection:
+        print("[matrix] baseline version not selected; reusing existing ground truth")
+
     run_rows: list[dict[str, Any]] = []
     created_worktrees: list[Path] = []
     instrument_args: list[str] = []
@@ -240,43 +270,48 @@ def main() -> int:
             _run(["git", "worktree", "add", "--detach", str(wt), version.ref], cwd=repo_root, dry_run=args.dry_run)
             created_worktrees.append(wt)
 
-        # 2) refresh ground truth from baseline version once per campaign
-        baseline = next(v for v in versions if v.id == baseline_version_id)
-        baseline_wt = worktree_root / baseline.id
-        baseline_commit = baseline.ref
-        if not args.dry_run:
-            baseline_commit = _git_output(baseline_wt, ["rev-parse", "--short", "HEAD"])
+        # 2) optionally refresh ground truth from baseline version once per campaign
+        if do_ground_truth_refresh:
+            baseline = next(v for v in versions if v.id == baseline_version_id)
+            baseline_wt = worktree_root / baseline.id
+            baseline_commit = baseline.ref
+            if not args.dry_run:
+                baseline_commit = _git_output(baseline_wt, ["rev-parse", "--short", "HEAD"])
 
-        gt_label = f"{campaign}__groundtruth__{baseline.id}"
-        gt_env = dict(os.environ)
-        gt_env["PYTHONPATH"] = str(baseline_wt)
-        _run(
-            [
-                str(python_exe),
-                str(audio_eval_script),
-                "--label",
-                gt_label,
-                "--commit",
-                baseline_commit,
-                "--model-path",
-                str(model_path),
-                "--mono-path",
-                str(mono_path),
-                "--stereo-path",
-                str(stereo_path),
-                "--clip-seconds",
-                str(clip_seconds),
-                "--warmup-seconds",
-                str(warmup_seconds),
-                "--ground-truth-path",
-                str(ground_truth_path),
-                "--create-ground-truth",
-                *instrument_args,
-            ],
-            cwd=repo_root,
-            env=gt_env,
-            dry_run=args.dry_run,
-        )
+            gt_label = f"{campaign}__groundtruth__{baseline.id}"
+            gt_env = dict(os.environ)
+            gt_env["PYTHONPATH"] = str(baseline_wt)
+            _run(
+                [
+                    str(python_exe),
+                    str(audio_eval_script),
+                    "--label",
+                    gt_label,
+                    "--commit",
+                    baseline_commit,
+                    "--model-path",
+                    str(model_path),
+                    "--mono-path",
+                    str(mono_path),
+                    "--stereo-path",
+                    str(stereo_path),
+                    "--clip-seconds",
+                    str(clip_seconds),
+                    "--warmup-seconds",
+                    str(warmup_seconds),
+                    "--ground-truth-path",
+                    str(ground_truth_path),
+                    "--create-ground-truth",
+                    *instrument_args,
+                ],
+                cwd=repo_root,
+                env=gt_env,
+                dry_run=args.dry_run,
+            )
+        elif not args.dry_run and not ground_truth_path.exists():
+            raise FileNotFoundError(
+                f"ground truth missing: {ground_truth_path}; run baseline refresh or omit --skip-ground-truth-refresh"
+            )
 
         # 3) run versions sequentially, repeat N times each
         for version in versions:

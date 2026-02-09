@@ -100,6 +100,16 @@ PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
   --campaign macmini-voxtral-clip180
 ```
 
+To evaluate only new/incoming versions while preserving prior baseline/final run artifacts and numbers, select explicit IDs and skip ground-truth refresh:
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
+  --matrix perf/version_matrix.json \
+  --campaign macmini-incoming-only \
+  --version-ids incoming_a1b2c3,incoming_d4e5f6 \
+  --skip-ground-truth-refresh
+```
+
 This runs each configured version sequentially and writes aggregate outputs to:
 - `perf/batch_runs/<campaign>/summary.json`
 - `perf/batch_runs/<campaign>/runs.csv`

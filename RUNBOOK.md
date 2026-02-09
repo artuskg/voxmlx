@@ -61,6 +61,16 @@ PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
   --campaign macmini-voxtral-clip180
 ```
 
+Run only incoming/new version IDs (reuse existing ground truth, do not rerun baseline):
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
+  --matrix perf/version_matrix.json \
+  --campaign macmini-incoming-only \
+  --version-ids incoming_a1b2c3,incoming_d4e5f6 \
+  --skip-ground-truth-refresh
+```
+
 Outputs:
 - Per-run raw metrics/transcripts: `perf/audio_runs/<campaign>__<version>__rNN/`\n
 - Aggregated report: `perf/batch_runs/<campaign>/summary.json`\n
