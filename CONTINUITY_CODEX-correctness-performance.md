@@ -244,6 +244,12 @@ Done:
       - first >`1e-2` at position `0` for all chunk sizes
       - position-0 max abs diff ~= `0.0625`
     - conclusion: mismatch is inherent to full-vs-cached transformer path with history, not a specific chunk size.
+  - Transformer layerwise isolation (20s, chunk=1, identical conv2 input):
+    - artifact: `perf/audio_runs/opus-checks-20260209-stage/transformer_layerwise_isolation_20s.json`
+    - layer 0 already diverges at position 0 (`pos0_max_abs=0.25`, first >`1e-2` at `0`)
+    - divergence persists through all layers and accumulates pre-norm (layer 31 `max_abs_global=35.0`)
+    - after final norm: divergence remains (`pos0_max_abs=0.0625`, first >`1e-2` at `0`)
+    - conclusion: root mismatch is introduced in transformer layer 0 full-vs-cached execution, then amplified by depth.
   - Transformer mask probe (20s):
     - artifact: `perf/audio_runs/opus-checks-20260209-stage/transformer_mask_probe_20s.json`
     - chunk1 cached path with `mask='causal'` vs `mask=None` produced identical mismatch vs full path.
@@ -334,6 +340,7 @@ Working set (files/ids/commands):
 - `perf/audio_runs/opus-checks-20260209-stage/transformer_chunking_isolation_20s.json`
 - `perf/audio_runs/opus-checks-20260209-stage/transformer_mask_probe_20s.json`
 - `perf/audio_runs/opus-checks-20260209-stage/attention_cache_path_single_token_probe.json`
+- `perf/audio_runs/opus-checks-20260209-stage/transformer_layerwise_isolation_20s.json`
 - `perf/ground_truth_mono.txt`
 - `perf/audio_runs/*/metrics.json`
 - `perf/audio_runs/*/*_transcript.txt`
