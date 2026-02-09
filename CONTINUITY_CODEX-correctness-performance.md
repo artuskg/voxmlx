@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: `origin/codex/correctness-performance-scaffold` advanced to include committed test audio under `perf/reference_audio`; current branch is monitoring this update.
-- Next: decide whether to merge/cherry-pick `bb7f2c1` into `codex/continuity-ledger-sync` before running the Mac Mini campaign.
+- Now: completed a sequential run for both matrix versions on the scaffold snapshot with reference audio (`local-seq-clip600-r1`, repeats=1) and collected summary metrics.
+- Next: decide whether to run higher-repeat campaign (for variance/stability) and whether to promote scaffold audio/matrix updates into `codex/continuity-ledger-sync`.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -56,6 +56,13 @@ Done:
 - 2026-02-09: Verified testable version refs in both local and source-branch matrices:
   - `baseline_v2` -> `9a08382`
   - `final_ea25661` -> `ea25661`
+- 2026-02-09: Executed sequential benchmark campaign from scaffold snapshot `bb7f2c1`:
+  - Command: `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --campaign local-seq-clip600-r1 --repeats 1 --python /Users/crabbotix/gitrepos/voxmlx/.venv313/bin/python`
+  - Artifact dir: `/Users/crabbotix/gitrepos/voxmlx/.tmp_scaffold_run/perf/batch_runs/local-seq-clip600-r1`
+  - Results:
+    - `baseline_v2` (`9a08382`): `317.512s`, `norm_edit=0.020814`, `token_err=0.031863`
+    - `final_ea25661` (`ea25661`): `320.192s`, `norm_edit=0.020814`, `token_err=0.031863`
+    - `speedup_vs_baseline_percent` (final): `-0.844%`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
