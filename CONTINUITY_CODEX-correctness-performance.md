@@ -24,7 +24,7 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: finalize commit/push with ledger + artifacts.
+- Now: finalize with rerun results recorded and pushed.
 - Next: optional larger-window/full-file confirmation runs.
 
 Done:
@@ -37,9 +37,12 @@ Done:
   - `voxmlx/audio.py`: cached STFT window + DFT basis (manual DFT path preserved)
 - Created mono ground truth: `perf/ground_truth_mono.txt`.
 - Stored run artifacts in `perf/audio_runs/<label>/`.
+- Reran ground truth (`baseline-v2-clip180-create-gt-rerun`) on user request.
+- Verified `perf/ground_truth_mono.txt` is unchanged by hash:
+  - old/new SHA-256: `c884ae4d490915b3d5bd6cfc61d1cb37485d58df1b4cd92404ec2fbb95348e5f`
 
 Now:
-- Commit ledger + run artifacts and push branch.
+- Commit/push rerun artifacts and ledger update.
 
 Next:
 - Optional: run same evaluation with longer clips (e.g., 600s) or full files to confirm scaling.
@@ -68,3 +71,4 @@ Performance results table:
 | opt-cachebasis-clearcache2048-clip180 | Revert to manual DFT; cache DFT basis + clear_cache(2048) | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 42.601 | 36.32% | 0.020814 / 0.031863 | Best experimental run; deviation back to baseline profile |
 | final-ea25661-clip180 | Committed optimization run #1 | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 51.083 | 23.64% | 0.020814 / 0.031863 | Meets speed target; baseline-equivalent deviation profile |
 | final-ea25661-clip180-r2 | Committed optimization run #2 (repeat) | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 57.770 | 13.65% | 0.020814 / 0.031863 | Repeat still above 10% target |
+| baseline-v2-clip180-create-gt-rerun | Rerun GT generation on request (machine-load check) | 9a08382 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 45.870 | 31.43% | 0.020814 / 0.031863 | `ground_truth_mono.txt` hash unchanged; GT stable |
