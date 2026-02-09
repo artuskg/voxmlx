@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: continuity updates are pushed on `codex/continuity-ledger-sync`; keep tracking `codex/correctness-performance-scaffold` for incoming updates.
-- Next: run Mac Mini non-dry campaign and periodically refresh branch-monitor snapshots.
+- Now: `origin/codex/correctness-performance-scaffold` advanced to include committed test audio under `perf/reference_audio`; current branch is monitoring this update.
+- Next: decide whether to merge/cherry-pick `bb7f2c1` into `codex/continuity-ledger-sync` before running the Mac Mini campaign.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -48,6 +48,11 @@ Done:
 - 2026-02-09: Post-push monitoring snapshot after `git fetch --all --prune`:
   - `codex/correctness-performance-scaffold` vs `origin/codex/correctness-performance-scaffold`: `0/0`
   - `codex/continuity-ledger-sync` vs `origin/codex/continuity-ledger-sync`: `0/0`
+- 2026-02-09: After another pull/fetch, source branch `origin/codex/correctness-performance-scaffold` moved to `bb7f2c1`:
+  - Added committed audio fixtures:
+    - `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav`
+    - `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav`
+  - Updated `perf/version_matrix.json` to `matrix_name=voxtral_clip600`, `clip_seconds=600`, and `mono/stereo` paths under `perf/reference_audio`.
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
