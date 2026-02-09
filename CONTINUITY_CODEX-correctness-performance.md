@@ -237,6 +237,21 @@ Done:
     - `generate_nonincremental` != `decode_from_incremental_embeds`
     - first divergence vs incremental-embeds decode: token `50`
     - conclusion: decoder logic itself is consistent; divergence is driven by encoder embedding differences.
+  - Transformer chunking isolation from identical conv2 input (20s):
+    - artifact: `perf/audio_runs/opus-checks-20260209-stage/transformer_chunking_isolation_20s.json`
+    - compared full-sequence transformer output vs chunked+cache outputs using same `conv2` tensor:
+      - chunk sizes `1,2,4,8` all show nearly identical mismatch profile
+      - first >`1e-2` at position `0` for all chunk sizes
+      - position-0 max abs diff ~= `0.0625`
+    - conclusion: mismatch is inherent to full-vs-cached transformer path with history, not a specific chunk size.
+  - Transformer mask probe (20s):
+    - artifact: `perf/audio_runs/opus-checks-20260209-stage/transformer_mask_probe_20s.json`
+    - chunk1 cached path with `mask='causal'` vs `mask=None` produced identical mismatch vs full path.
+    - conclusion: changing cached-path mask between `causal` and `None` does not explain the observed divergence.
+  - Single-token no-history cache probe:
+    - artifact: `perf/audio_runs/opus-checks-20260209-stage/attention_cache_path_single_token_probe.json`
+    - layer-wise attention output with/without cache is exactly equal for one token and empty history.
+    - conclusion: divergence arises when history is present across multiple steps, not from one-step cache mechanics.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -268,6 +283,9 @@ Next:
 - Use focused tracer around first divergence while testing encoder-alignment fixes; success criterion is stable argmax agreement at/after index 50 on the 120s diagnostic run.
 - Focus immediate debugging on why offline `encode()` and incremental `encode_step()` diverge numerically so early (operation ordering / masking path), since async and EOS-collapse hypotheses were falsified.
 - Target immediate fix attempt on encoder transformer equivalence (`forward_transformer` full-seq vs chunked-cache path), since conv mismatch appears later than the first token divergence trigger.
+- Proposed fix sequencing:
+  - correctness-first: unify offline encoding path to use the same incremental encoder algorithm as `encode_step` (eliminate path mismatch by construction).
+  - deeper investigation: continue probing MLX full-vs-cached transformer history semantics if we want true mathematical parity between both encoder APIs.
 - Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
 - Rebaseline existing perf run deviation metrics against updated ground truth.
 - Optionally regenerate with identical timing conditions on a quieter machine for cleaner speed comparison.
@@ -313,6 +331,9 @@ Working set (files/ids/commands):
 - `perf/audio_runs/opus-checks-20260209-stage/stage_localization_20s.json`
 - `perf/audio_runs/opus-checks-20260209-stage/stage_localization_120s.json`
 - `perf/audio_runs/opus-checks-20260209-stage/decode_from_embeds_20s.json`
+- `perf/audio_runs/opus-checks-20260209-stage/transformer_chunking_isolation_20s.json`
+- `perf/audio_runs/opus-checks-20260209-stage/transformer_mask_probe_20s.json`
+- `perf/audio_runs/opus-checks-20260209-stage/attention_cache_path_single_token_probe.json`
 - `perf/ground_truth_mono.txt`
 - `perf/audio_runs/*/metrics.json`
 - `perf/audio_runs/*/*_transcript.txt`
