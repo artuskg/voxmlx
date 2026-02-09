@@ -172,6 +172,8 @@ def main() -> int:
     parser.add_argument("--audio-eval-script", type=Path, default=Path("scripts/audio_eval.py"))
     parser.add_argument("--keep-worktrees", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--instrument", action="store_true", help="Pass instrumentation flags to audio_eval")
+    parser.add_argument("--instrument-sample-seconds", type=float, default=1.0)
     args = parser.parse_args()
 
     repo_root = Path(_git_output(Path.cwd(), ["rev-parse", "--show-toplevel"]))
@@ -221,6 +223,13 @@ def main() -> int:
 
     run_rows: list[dict[str, Any]] = []
     created_worktrees: list[Path] = []
+    instrument_args: list[str] = []
+    if args.instrument:
+        instrument_args = [
+            "--instrument",
+            "--instrument-sample-seconds",
+            str(args.instrument_sample_seconds),
+        ]
 
     try:
         # 1) prepare worktrees sequentially
@@ -262,6 +271,7 @@ def main() -> int:
                 "--ground-truth-path",
                 str(ground_truth_path),
                 "--create-ground-truth",
+                *instrument_args,
             ],
             cwd=repo_root,
             env=gt_env,
@@ -300,6 +310,7 @@ def main() -> int:
                         str(warmup_seconds),
                         "--ground-truth-path",
                         str(ground_truth_path),
+                        *instrument_args,
                     ],
                     cwd=repo_root,
                     env=env,

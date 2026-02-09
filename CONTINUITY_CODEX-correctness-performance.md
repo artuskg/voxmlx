@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: completed a sequential run for both matrix versions on the scaffold snapshot with reference audio (`local-seq-clip600-r1`, repeats=1) and collected summary metrics.
-- Next: decide whether to run higher-repeat campaign (for variance/stability) and whether to promote scaffold audio/matrix updates into `codex/continuity-ledger-sync`.
+- Now: added instrumentation plumbing for utilization diagnostics (`audio_eval` + `run_version_matrix`) and validated it with a short smoke run.
+- Next: run an instrumented real benchmark pass and inspect utilization summary (`metrics.json` + `system_samples.json`) before additional optimization work.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -67,6 +67,14 @@ Done:
   - one-time model download took ~`450.8s` on this machine;
   - campaign run (`repeats=1`) took ~`957.5s` because it executes **three** full mono+stereo passes (ground-truth refresh + baseline + final), each on 600s mono + 600s stereo.
   - Hardware/power check: Mac mini `M4 Pro` on AC power (`pmset`: `powermode 0`).
+- 2026-02-09: Added instrumentation support:
+  - `/Users/crabbotix/gitrepos/voxmlx/scripts/audio_eval.py`:
+    - new flags: `--instrument`, `--instrument-sample-seconds`
+    - writes per-sample telemetry to `system_samples.json`
+    - embeds instrumentation summary in `metrics.json` including device selection (`default_device`, Metal availability/info), process CPU/RSS peaks, system load, and MLX memory peaks.
+  - `/Users/crabbotix/gitrepos/voxmlx/scripts/run_version_matrix.py`:
+    - new flags: `--instrument`, `--instrument-sample-seconds` (propagated to audio-eval invocations).
+  - Smoke validation succeeded (`instrumentation-smoke2`, clip=2s) and confirmed `default_device=Device(gpu, 0)`.
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
