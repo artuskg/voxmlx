@@ -187,6 +187,13 @@ Done:
     - global max abs embed diff across positions: `4.375`; mean max-abs-per-position: `0.9308`
     - near divergence region (audio pos 86..90): max abs diffs ~`0.063` to `0.25`
   - interpretation: first output-token divergence at index 50 is caused by decoder argmax flip under same token history/audio position, strongly indicating upstream audio embedding mismatch between non-incremental and incremental encode paths.
+- Integrated and pushed focused tracer changes:
+  - commit: `1b4a850`
+  - branch: `codex/correctness-performance-scaffold`
+  - remote: `origin/codex/correctness-performance-scaffold`
+  - post-push `git status --short`: clean for tracked files; remaining untracked prior artifacts:
+    - `perf/audio_runs/semantic-compare-dft-vs-fft-20260209T143909Z/`
+    - `perf/audio_runs/trace-noninc-vs-inc-20260209T151236Z/`
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -269,6 +276,7 @@ Working set (files/ids/commands):
 - Streaming class-refactor commit: `cce41e1`
 - Constants/config-validation follow-up commit: `dc994b1`
 - KV/RoPE scaffold tests commit: `b4c54c7`
+- Focused tracer commit: `1b4a850`
 
 Performance results table:
 | Label | Change summary | Commit | Model | Config | Audio | Time (s) | Speedup vs baseline | Deviation vs GT (norm edit / token err) | Notes |
