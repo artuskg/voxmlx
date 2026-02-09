@@ -4,6 +4,7 @@ This repository now uses two lanes:
 
 1. Correctness lane (required)
 2. Performance lane (tracked, warn-only by default)
+3. Optional model-backed differential lane (off by default)
 
 ## Correctness Lane
 
@@ -38,9 +39,32 @@ python3 scripts/check_perf_regression.py \
 
 Use `--warn-only` during baseline calibration or noisy environments.
 
+## Optional Model-Backed Differential Lane
+
+Run only when local model/audio fixtures are available.
+
+Required env vars:
+- `VOXMLX_ENABLE_MODEL_TESTS=1`
+- `VOXMLX_TEST_MODEL_PATH=/absolute/path/to/model`
+- `VOXMLX_TEST_AUDIO_PATH=/absolute/path/to/audio.wav`
+
+Optional env vars (to compare original vs converted format):
+- `VOXMLX_TEST_MODEL_PATH_ORIGINAL=/absolute/path/to/original/model`
+- `VOXMLX_TEST_MODEL_PATH_CONVERTED=/absolute/path/to/converted/model`
+
+Command:
+
+```bash
+VOXMLX_ENABLE_MODEL_TESTS=1 \
+VOXMLX_TEST_MODEL_PATH=/path/to/model \
+VOXMLX_TEST_AUDIO_PATH=/path/to/audio.wav \
+python3 -m unittest tests.test_model_differential -v
+```
+
 ## CI Behavior
 
 GitHub Actions workflow `.github/workflows/correctness-performance.yml`:
 - Always runs correctness tests.
 - Runs microbenchmarks and checks regressions in warn-only mode.
 - Uploads benchmark JSON as an artifact for trend tracking.
+- Does not run model-backed differential tests by default.

@@ -14,8 +14,8 @@ Key decisions:
 
 State:
 - Done: Branch + ledger created; scaffolding implemented; local tests/bench checks executed; commit created.
-- Now: Report outcomes and handle remote push permissions.
-- Next: Push branch to a writable remote or grant access to `awni/voxmlx`.
+- Now: Update remote to user fork, push branch, add optional model-backed differential tests, and create project-local `AGENTS.md` + `RUNBOOK.md`.
+- Next: Validate tests/docs, commit, and push follow-up changes.
 
 Done:
 - Added `voxmlx/contracts.py` with remap/format/sharding/prompt-token helpers.
@@ -26,15 +26,18 @@ Done:
 - Added docs: `docs/correctness_performance.md` and README pointer.
 - Calibrated benchmark baseline: `perf/baseline_contracts.json`.
 - Committed changes: `b5e8a09`.
+- Added optional model-backed differential tests in `tests/test_model_differential.py` (env-gated).
+- Added project-local `AGENTS.md` and `RUNBOOK.md`.
+- Updated docs for optional model-backed lane and runbook pointer.
 
 Now:
-- Push blocked: `git push -u origin codex/correctness-performance-scaffold` returned HTTP 403 (no write permission to `awni/voxmlx`).
+- Validate updated test suite (including default skip behavior for model tests).
+- Repoint `origin` to `https://github.com/artuskg/voxmlx.git`, commit changes, and push branch.
 
 Next:
 - If requested: add model-backed differential tests guarded behind optional env flags.
 
 Open questions (UNCONFIRMED if needed):
-- UNCONFIRMED: writable remote for push (fork or granted collaborator permission).
 - UNCONFIRMED: desired strictness/date for switching perf check from warn-only to failing gate.
 
 Working set (files/ids/commands):
@@ -51,3 +54,7 @@ Working set (files/ids/commands):
 - `perf/baseline_contracts.json`
 - `CONTINUITY_CODEX-correctness-performance.md`
 - Commit: `b5e8a09`
+- `git remote set-url origin https://github.com/artuskg/voxmlx.git`
+- `tests/test_model_differential.py`
+- `AGENTS.md`
+- `RUNBOOK.md`

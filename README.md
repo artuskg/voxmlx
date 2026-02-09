@@ -83,3 +83,6 @@ print(text)
 
 For test and benchmark commands used to guard correctness while optimizing performance, see:
 `docs/correctness_performance.md`.
+
+Operational commands and environment profiles are documented in:
+`RUNBOOK.md`.

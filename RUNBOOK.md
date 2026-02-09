@@ -1,0 +1,71 @@
+# RUNBOOK.md — voxmlx
+
+## Prerequisites
+
+- Python: `python3 --version` (3.10+ recommended)
+- Optional package install for local dev:
+  - `python3 -m pip install -e .`
+- Optional heavy dependencies for model-backed tests:
+  - `mlx`, `mistral-common`, `soundfile`
+
+## Environment/Profile Matrix
+
+- Profile `lightweight` (default): no model downloads; fast correctness + perf guardrails.
+- Profile `model-differential` (optional): requires local model path(s) and audio fixture.
+
+## Run commands
+
+- Correctness lane:
+  - `python3 -m unittest discover -s tests -p 'test_*.py' -v`
+- Perf baseline generation:
+  - `python3 scripts/bench_contracts.py --iterations 20000 --output perf/baseline_contracts.json`
+- Perf current run:
+  - `python3 scripts/bench_contracts.py --iterations 20000 --output perf/current_contracts.json`
+- Perf regression check:
+  - `python3 scripts/check_perf_regression.py --baseline perf/baseline_contracts.json --current perf/current_contracts.json --threshold 0.20 --warn-only`
+
+### Optional model-backed differential tests
+
+- Required env vars:
+  - `VOXMLX_ENABLE_MODEL_TESTS=1`
+  - `VOXMLX_TEST_MODEL_PATH=/absolute/path/to/model`
+  - `VOXMLX_TEST_AUDIO_PATH=/absolute/path/to/audio.wav`
+- Optional for format-differential assertion:
+  - `VOXMLX_TEST_MODEL_PATH_ORIGINAL=/absolute/path/to/original/model`
+  - `VOXMLX_TEST_MODEL_PATH_CONVERTED=/absolute/path/to/converted/model`
+- Run:
+  - `VOXMLX_ENABLE_MODEL_TESTS=1 VOXMLX_TEST_MODEL_PATH=... VOXMLX_TEST_AUDIO_PATH=... python3 -m unittest tests.test_model_differential -v`
+
+## Health checks
+
+- Verify branch and cleanliness:
+  - `git status --short --branch`
+- Verify remote target before push:
+  - `git remote -v`
+- Verify lightweight lane still passes:
+  - `python3 -m unittest discover -s tests -p 'test_*.py' -v`
+
+## Restart/Resume steps
+
+- If perf check fails unexpectedly:
+  1. Re-run benchmark twice to reduce noise.
+  2. Compare `perf/current_contracts.json` to `perf/baseline_contracts.json`.
+  3. Keep `--warn-only` until a stable new baseline is agreed.
+- If model differential tests fail:
+  1. Confirm paths and env vars are set correctly.
+  2. Re-run at `temperature=0.0` (already enforced by tests).
+  3. Check whether failure is deterministic across two runs.
+
+## Outputs/Artifacts
+
+- Baseline perf artifact: `perf/baseline_contracts.json`
+- Temporary perf artifact: `perf/current_contracts.json`
+- Correctness/perf guide: `docs/correctness_performance.md`
+- CI workflow: `.github/workflows/correctness-performance.yml`
+
+## Escalation checklist
+
+1. Include exact failing command and full error.
+2. Report whether failure reproduces on a clean rerun.
+3. Report current branch, commit SHA, and remote target.
+4. For performance issues, include before/after `per_op_us` metrics.
