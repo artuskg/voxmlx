@@ -12,7 +12,7 @@ Key decisions:
 - Treat decoder-window-wrap hypotheses as lower priority unless runtime evidence supports them.
 
 State:
-- In progress; cross-ledger synthesis requested and prepared.
+- In progress; packaging findings into PR-ready bug dossier for upstream author.
 
 Done:
 - Verified current code paths in `voxmlx/generate.py`, `voxmlx/stream.py`, `voxmlx/model.py`, `voxmlx/encoder.py`, `voxmlx/cache.py`, and `voxmlx/language_model.py`.
@@ -67,15 +67,32 @@ Done:
   - Outputs are exactly equal through position `133` (including positions `86..90` used at first token divergence).
   - First nonzero mismatch at position `134` (`max_abs=0.0812988`), first >`0.1` at `135`.
   - Conclusion: conv path is not the trigger for token-50 divergence; mismatch enters downstream in transformer path.
+- Reproduced non-incremental vs incremental comparison on original-author commit `e6d193e85e84e30f26e370c66973ce287b8a9d57` using isolated worktree (`/tmp/voxmlx_e6d193e`) and same model/audio:
+  - 120s run artifact:
+    - `perf/audio_runs/commit-compare-e6d193e-20260209T000000Z/comparison.json`
+    - first divergence index: `50`
+    - token norm vs incremental: `0.254473`
+    - embedding drift profile: first >`1e-2` at pos `2`, >`0.1` at `18`, >`1.0` at `48`, `max_abs_at_88=0.126953`.
+  - 20s run artifact:
+    - `perf/audio_runs/commit-compare-e6d193e-20s-20260209T000000Z/comparison.json`
+    - first divergence index: `50`
+    - token norm vs incremental: `0.065637`
+    - embedding drift profile: first >`1e-2` at pos `2`, >`0.1` at `18`, >`1.0` at `48`, `max_abs_at_88=0.126953`.
+  - Conclusion: divergence signature existed on original-author commit before our later changes; this issue was not introduced by recent work.
+- User requested preparation of a highly actionable bug PR package for the original author repo.
+- Added PR-ready bug dossier docs:
+  - `docs/bug_reports/encoder_divergence_nonincremental_vs_incremental.md`
+  - `docs/bug_reports/PR_BODY_encoder_divergence.md`
+- Included original-author reproduction artifacts in working tree:
+  - `perf/audio_runs/commit-compare-e6d193e-20260209T000000Z/comparison.json`
+  - `perf/audio_runs/commit-compare-e6d193e-20s-20260209T000000Z/comparison.json`
 
 Now:
-- Report integrated conclusions from all ledgers + Pro/Opus notes, including new conv equivalence result, and propose concrete forward execution plan.
+- Commit/push bug dossier docs + original-author comparison artifacts; provide final PR-ready text.
 
 Next:
-- Recommend where to instrument first in encoder path.
-- Propose smallest experiments to confirm whether batch encode should be replaced by incremental encode path for offline generation.
-- Use `sliding_window` sweep outcomes to separate decoder-window effects from encoder-path mismatch effects.
-- Propose phased remediation (correctness-first path + optional performance restoration path).
+- Commit/push new bug-report docs + newly created original-commit comparison artifacts.
+- Provide ready-to-paste PR text and suggested PR title.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: Whether this mismatch is intended (model expects streaming/chunked encoder semantics) vs unintended (MLX cached-causal SDPA mismatch for Q!=K lengths).
