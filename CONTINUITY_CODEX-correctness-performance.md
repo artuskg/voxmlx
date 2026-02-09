@@ -14,8 +14,8 @@ Key decisions:
 
 State:
 - Done: Branch + ledger created; scaffolding implemented; local tests/bench checks executed; commit created.
-- Now: Update remote to user fork, push branch, add optional model-backed differential tests, and create project-local `AGENTS.md` + `RUNBOOK.md`.
-- Next: Validate tests/docs, commit, and push follow-up changes.
+- Now: Report completion and share branch/PR details.
+- Next: Optional follow-up is enabling strict perf gate timing and adding real model fixtures.
 
 Done:
 - Added `voxmlx/contracts.py` with remap/format/sharding/prompt-token helpers.
@@ -29,10 +29,14 @@ Done:
 - Added optional model-backed differential tests in `tests/test_model_differential.py` (env-gated).
 - Added project-local `AGENTS.md` and `RUNBOOK.md`.
 - Updated docs for optional model-backed lane and runbook pointer.
+- Updated `origin` to `https://github.com/artuskg/voxmlx.git`.
+- Pushed branch `codex/correctness-performance-scaffold` to fork remote.
 
 Now:
-- Validate updated test suite (including default skip behavior for model tests).
-- Repoint `origin` to `https://github.com/artuskg/voxmlx.git`, commit changes, and push branch.
+- Local validation is complete:
+  - `python3 -m unittest discover -s tests -p 'test_*.py' -v` (6 passed, 1 skipped by env gate)
+  - `python3 scripts/bench_contracts.py --iterations 5000 --output perf/current_contracts.json`
+  - `python3 scripts/check_perf_regression.py --baseline perf/baseline_contracts.json --current perf/current_contracts.json --threshold 0.20 --warn-only`
 
 Next:
 - If requested: add model-backed differential tests guarded behind optional env flags.
@@ -58,3 +62,4 @@ Working set (files/ids/commands):
 - `tests/test_model_differential.py`
 - `AGENTS.md`
 - `RUNBOOK.md`
+- Push target: `origin/codex/correctness-performance-scaffold`
