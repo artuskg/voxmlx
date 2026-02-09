@@ -53,6 +53,9 @@ Done:
     - `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav`
     - `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav`
   - Updated `perf/version_matrix.json` to `matrix_name=voxtral_clip600`, `clip_seconds=600`, and `mono/stereo` paths under `perf/reference_audio`.
+- 2026-02-09: Verified testable version refs in both local and source-branch matrices:
+  - `baseline_v2` -> `9a08382`
+  - `final_ea25661` -> `ea25661`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
