@@ -6,6 +6,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .constants import DEFAULT_DELAY_TOKENS, DEFAULT_LEFT_PAD_TOKENS
+
 # Weight name remapping patterns: (regex, replacement)
 REMAP_PATTERNS = [
     # Encoder conv layers
@@ -101,8 +103,8 @@ def make_weight_shards(weights: dict[str, Any], max_file_size_gb: int = 5) -> li
 
 def build_prompt_tokens(
     tokenizer: Any,
-    n_left_pad_tokens: int = 32,
-    num_delay_tokens: int = 6,
+    n_left_pad_tokens: int = DEFAULT_LEFT_PAD_TOKENS,
+    num_delay_tokens: int = DEFAULT_DELAY_TOKENS,
 ) -> tuple[list[int], int]:
     """Build the streaming prefix tokens contract used by transcription."""
     streaming_pad = tokenizer.get_special_token("[STREAMING_PAD]")

@@ -26,7 +26,7 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: commit and push the `stream.py` class refactor with validation evidence.
+- Now: commit and push follow-up constants/validation cleanup from review issue #12.
 - Next: rerun updated 10-minute matrix on Mac Mini for 10x repeats per version.
 
 Done:
@@ -67,16 +67,17 @@ Done:
   - #9 Addressed: resampling limitation documented in `voxmlx/audio.py`.
   - #10 Fixed: `voxmlx/stream.py` now uses explicit `StreamingTranscriber` class state/methods instead of nested nonlocal state management.
   - #11 Fixed: reusable `Transcriber` API added in `voxmlx/__init__.py`; `transcribe()` can reuse preloaded bundle.
-  - #12 Partially fixed: shared constants centralized in `voxmlx/constants.py` and wired across audio/prompt/stream defaults.
+  - #12 Fixed: shared constants are centralized (`voxmlx/constants.py`), prompt-token defaults now consume them in `voxmlx/contracts.py`, CLI help no longer hardcodes decoder-window literals, and `load_model()` now validates config `downsample_factor` assumptions in `voxmlx/__init__.py`.
   - #13 Fixed: remap regex patterns precompiled in `voxmlx/contracts.py`.
   - #14 Fixed: decoder `sliding_window` is now configurable through API/CLI and defaults to config value when available.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
   - `python3 -m py_compile voxmlx/stream.py voxmlx/audio.py voxmlx/model.py` -> pass.
+  - `python3 -m py_compile voxmlx/__init__.py voxmlx/contracts.py voxmlx/stream.py` -> pass.
 
 Now:
-- Commit and push the class-based streaming refactor and ledger updates.
+- Commit and push constants/validation follow-up and ledger updates.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -86,6 +87,9 @@ Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
 
 Working set (files/ids/commands):
+- `voxmlx/stream.py`
+- `voxmlx/contracts.py`
+- `voxmlx/__init__.py`
 - `scripts/audio_eval.py`
 - `voxmlx/audio.py`
 - `voxmlx/generate.py`
@@ -100,6 +104,7 @@ Working set (files/ids/commands):
 - `tests/test_mlx_runtime_optional.py`
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
+- Streaming class-refactor commit: `cce41e1`
 
 Performance results table:
 | Label | Change summary | Commit | Model | Config | Audio | Time (s) | Speedup vs baseline | Deviation vs GT (norm edit / token err) | Notes |

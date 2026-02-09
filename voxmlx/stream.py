@@ -394,7 +394,7 @@ def main():
         "--sliding-window",
         type=int,
         default=None,
-        help="Decoder KV sliding window size (defaults to model config or 8192)",
+        help=f"Decoder KV sliding window size (defaults to model config or {DEFAULT_DECODER_SLIDING_WINDOW})",
     )
     args = parser.parse_args()
 

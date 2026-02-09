@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 
 LoadedModelBundle = tuple[Any, Any, dict]
+_EXPECTED_DOWNSAMPLE_FACTOR = 4
 
 
 def _load_tokenizer(model_path: Path) -> Tekkenizer:
@@ -44,8 +45,27 @@ def load_model(model_path: str = "mlx-community/Voxtral-Mini-4B-Realtime-6bit"):
         model_path = Path(model_path)
 
     model, config = _load_weights(model_path)
+    _validate_model_config(config)
     sp = _load_tokenizer(model_path)
     return model, sp, config
+
+
+def _validate_model_config(config: dict):
+    """Fail fast when config values would invalidate runtime token timing assumptions."""
+    downsample_factor = (
+        config.get("multimodal", {})
+        .get("whisper_model_args", {})
+        .get("downsample_args", {})
+        .get("downsample_factor")
+    )
+    if downsample_factor is None:
+        return
+    if int(downsample_factor) != _EXPECTED_DOWNSAMPLE_FACTOR:
+        raise ValueError(
+            "Unsupported config downsample_factor="
+            f"{downsample_factor}. Expected {_EXPECTED_DOWNSAMPLE_FACTOR} for "
+            "the current streaming/token alignment constants."
+        )
 
 
 class Transcriber:
@@ -120,7 +140,7 @@ def main():
         "--sliding-window",
         type=int,
         default=None,
-        help="Decoder KV sliding window size (defaults to model config or 8192)",
+        help=f"Decoder KV sliding window size (defaults to model config or {DEFAULT_DECODER_SLIDING_WINDOW})",
     )
     args = parser.parse_args()
 
