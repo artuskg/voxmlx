@@ -14,7 +14,6 @@ from .cache import RotatingKVCache
 from .constants import (
     DEFAULT_CLEAR_CACHE_INTERVAL,
     DEFAULT_DECODER_SLIDING_WINDOW,
-    DEFAULT_LEFT_PAD_TOKENS,
     DEFAULT_RIGHT_PAD_TOKENS,
 )
 
@@ -74,6 +73,7 @@ class EmbeddingQueue:
     def __init__(self):
         self._chunks = deque()
         self._len = 0
+        self._feature_dim = None
 
     def __len__(self):
         return self._len
@@ -81,18 +81,22 @@ class EmbeddingQueue:
     def clear(self):
         self._chunks.clear()
         self._len = 0
+        self._feature_dim = None
 
     def append(self, embeds: mx.array | None):
         if embeds is None:
             return
         if embeds.shape[0] == 0:
             return
+        if self._feature_dim is None:
+            self._feature_dim = embeds.shape[1]
         self._chunks.append(embeds)
         self._len += embeds.shape[0]
 
     def pop(self, n: int) -> mx.array:
         if n <= 0:
-            return mx.zeros((0, 0))
+            hidden_dim = 0 if self._feature_dim is None else self._feature_dim
+            return mx.zeros((0, hidden_dim))
         if n > self._len:
             raise ValueError(f"Requested {n} embeds with only {self._len} buffered")
 
@@ -125,10 +129,17 @@ class StreamingTranscriber:
         self.temperature = temperature
 
         prompt_tokens, n_delay_tokens = _build_prompt_tokens(sp)
+        self.n_delay_tokens = int(n_delay_tokens)
         self.prefix_len = len(prompt_tokens)
+        self.n_left_pad_tokens = self.prefix_len - 1 - self.n_delay_tokens
+        if self.n_left_pad_tokens < 0:
+            raise ValueError(
+                f"Invalid prompt token layout: prefix_len={self.prefix_len}, "
+                f"n_delay_tokens={self.n_delay_tokens}"
+            )
         self.eos_token_id = sp.eos_id
 
-        self.t_cond = model.time_embedding(mx.array([n_delay_tokens], dtype=mx.float32))
+        self.t_cond = model.time_embedding(mx.array([self.n_delay_tokens], dtype=mx.float32))
         mx.eval(self.t_cond)
 
         prompt_ids = mx.array([prompt_tokens])
@@ -169,8 +180,9 @@ class StreamingTranscriber:
 
     def callback(self, indata, frames, time_info, status):
         del frames, time_info
+        chunk = indata[:, 0].copy()
         with self.lock:
-            self.callback_chunks.append(indata[:, 0].copy())
+            self.callback_chunks.append(chunk)
             if status:
                 self._audio_status_count += 1
                 self._last_audio_status = str(status)
@@ -208,7 +220,7 @@ class StreamingTranscriber:
     def _feed_available_audio(self):
         if self.first_cycle and len(self.pending_audio) >= SAMPLES_PER_TOKEN:
             left_pad = np.zeros(
-                DEFAULT_LEFT_PAD_TOKENS * SAMPLES_PER_TOKEN, dtype=np.float32
+                self.n_left_pad_tokens * SAMPLES_PER_TOKEN, dtype=np.float32
             )
             n_feed = (len(self.pending_audio) // SAMPLES_PER_TOKEN) * SAMPLES_PER_TOKEN
             fed_audio = self.pending_audio.pop(n_feed)
@@ -226,7 +238,7 @@ class StreamingTranscriber:
 
     def _n_decodable(self):
         safe_total = (
-            DEFAULT_LEFT_PAD_TOKENS + self.n_audio_samples_fed // SAMPLES_PER_TOKEN
+            self.n_left_pad_tokens + self.n_audio_samples_fed // SAMPLES_PER_TOKEN
         )
         return min(len(self.audio_embeds), safe_total - self.n_total_decoded)
 
@@ -268,7 +280,8 @@ class StreamingTranscriber:
             text = self.sp.decode([token_id], special_token_policy=SpecialTokenPolicy.IGNORE)
             print(text, end="", flush=True)
 
-            if i > 0 and i % DEFAULT_CLEAR_CACHE_INTERVAL == 0:
+            global_decode_pos = self.n_total_decoded + i
+            if global_decode_pos > 0 and global_decode_pos % DEFAULT_CLEAR_CACHE_INTERVAL == 0:
                 mx.clear_cache()
 
             self.y = next_y
@@ -367,8 +380,6 @@ class StreamingTranscriber:
                 self.n_total_decoded += n_consumed
                 if hit_eos:
                     self.reset_all_state()
-
-                time.sleep(0.02)
 
         except KeyboardInterrupt:
             pass

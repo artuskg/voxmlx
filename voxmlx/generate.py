@@ -76,4 +76,9 @@ def generate(
 
         y = next_y
 
+    # Flush last pending token when loop ends without EOS.
+    token_id = y.item()
+    if token_id != eos_token_id:
+        output_tokens.append(token_id)
+
     return output_tokens

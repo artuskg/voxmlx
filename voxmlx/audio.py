@@ -101,7 +101,13 @@ _MEL_FILTERS = None
 _STFT_WINDOW = None
 _DFT_REAL = None
 _DFT_IMAG = None
-_STFT_BACKEND = os.getenv("VOXMLX_STFT_BACKEND", "dft").strip().lower()
+_stft_backend_env = os.getenv("VOXMLX_STFT_BACKEND")
+if _stft_backend_env is None:
+    _STFT_BACKEND = "fft" if hasattr(mx, "fft") else "dft"
+else:
+    _STFT_BACKEND = _stft_backend_env.strip().lower()
+if _STFT_BACKEND not in {"dft", "fft"}:
+    _STFT_BACKEND = "dft"
 
 
 def _get_mel_filters() -> mx.array:

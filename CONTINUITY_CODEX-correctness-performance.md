@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: waiting for next step (reference gathering + ring-buffer implementation) with scaffold tests in place.
-- Next: gather external references and implement ring-buffer cache against scaffold contracts.
+- Now: commit/push latest consolidated bug-fix batch and test updates.
+- Next: proceed with remaining performance-heavy items (encoder KV concat overhead and long-file streaming/offline unification).
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -78,6 +78,17 @@ Done:
     - chunked-update cache behavior is equivalent to tokenwise updates (set-wise, order-agnostic)
     - RoPE chunk offset application matches full-sequence RoPE exactly
     - decode-step attention using cache matches reference tail-window attention with RoPE offsets
+- Latest consolidated bug-fix pass:
+  - Fixed offline final-pending-token truncation in `voxmlx/generate.py` by flushing non-EOS `y` after decode loop.
+  - Changed STFT backend default policy in `voxmlx/audio.py` to prefer FFT when available (`VOXMLX_STFT_BACKEND` still overrides).
+  - `StreamingTranscriber` now derives/stores `n_left_pad_tokens` and `n_delay_tokens` from prompt construction; removed duplicated left-pad constant coupling in decode budget and first-cycle pad sizing.
+  - Moved audio callback `.copy()` outside lock in `voxmlx/stream.py`.
+  - Streaming `mx.clear_cache()` now uses global decode position (`self.n_total_decoded + i`) instead of per-call index.
+  - Removed unconditional end-of-loop `time.sleep(0.02)` so sleep only happens on idle/no-work branches.
+  - Fixed `EmbeddingQueue.pop(n<=0)` shape to return `(0, hidden_dim)` when known.
+  - Added optional runtime tests:
+    - `test_generate_flushes_final_pending_token`
+    - `test_encode_matches_incremental_encode_step` (offline vs incremental encoder equivalence under streaming-like chunk sizes)
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -88,20 +99,24 @@ Done:
   - `python3 -m py_compile tests/test_kv_cache_rope_scaffold_optional.py` -> pass.
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional tests.test_kv_cache_rope_scaffold_optional -v` -> pass.
+  - `python3 -m py_compile voxmlx/generate.py voxmlx/stream.py voxmlx/audio.py tests/test_mlx_runtime_optional.py` -> pass.
 
 Now:
-- Hold for next instruction; scaffold tests are committed/pushed.
+- Commit and push the latest bug-fix + test updates.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
 - Address any regressions found during matrix runs.
 - Use the new KV/RoPE scaffold tests while implementing ring-buffer cache replacement.
+- Add encoder offline-vs-incremental equivalence test coverage.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
 
 Working set (files/ids/commands):
 - `tests/test_kv_cache_rope_scaffold_optional.py` (new)
+- `tests/test_mlx_runtime_optional.py`
+- `voxmlx/generate.py`
 - `voxmlx/cache.py`
 - `voxmlx/model.py`
 - `voxmlx/stream.py`
