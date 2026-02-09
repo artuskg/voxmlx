@@ -63,6 +63,10 @@ Done:
     - `baseline_v2` (`9a08382`): `317.512s`, `norm_edit=0.020814`, `token_err=0.031863`
     - `final_ea25661` (`ea25661`): `320.192s`, `norm_edit=0.020814`, `token_err=0.031863`
     - `speedup_vs_baseline_percent` (final): `-0.844%`
+- 2026-02-09: Runtime decomposition for perceived slowness:
+  - one-time model download took ~`450.8s` on this machine;
+  - campaign run (`repeats=1`) took ~`957.5s` because it executes **three** full mono+stereo passes (ground-truth refresh + baseline + final), each on 600s mono + 600s stereo.
+  - Hardware/power check: Mac mini `M4 Pro` on AC power (`pmset`: `powermode 0`).
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
