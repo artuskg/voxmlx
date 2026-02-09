@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: new model-backed contract test added for offline `encode` vs incremental `encode_step` on reference mono; current result indicates a real mismatch under real model/audio.
-- Next: triage and fix the mismatch (likely cached encoder attention/mask behavior), then make the contract pass.
+- Now: generated full 10-minute incremental transcript on reference mono and stored artifacts under `perf/audio_runs/`.
+- Next: compare this incremental output against baseline/offline transcripts and triage mismatch root cause.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -101,6 +101,12 @@ Done:
     - offline path: `pad_audio -> log_mel_spectrogram -> model.encode`
     - incremental path: `log_mel_spectrogram_step + model.encode_step`
   - configurable clip duration via `VOXMLX_TEST_REFERENCE_MONO_MAX_SECONDS` (default `600`).
+- Generated full incremental transcript for 10-minute reference mono:
+  - run dir: `perf/audio_runs/incremental-file-10min-20260209T135727Z/`
+  - transcript: `perf/audio_runs/incremental-file-10min-20260209T135727Z/mono_incremental_transcript.txt`
+  - summary: `perf/audio_runs/incremental-file-10min-20260209T135727Z/summary.json`
+  - config: `method=incremental_file_pipeline`, `stft_backend=dft`
+  - elapsed: `374.227s`, tokens=`7510`, chars=`8452`
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -121,7 +127,7 @@ Done:
     - observed: `abs_err = 2.4375` (threshold `1e-4`), shape matched.
 
 Now:
-- Use the new failing contract to guide root-cause fixes in encoder incremental path.
+- Share generated incremental transcript path and metadata with user.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -130,6 +136,7 @@ Next:
 - Add encoder offline-vs-incremental equivalence test coverage.
 - If needed, add token-level instrumentation to log raw token IDs + special/non-special ratios over time.
 - Investigate encoder cached attention alignment (`mask="causal"` with `q_len != k_len`) as primary suspect for contract failure.
+- Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -138,6 +145,8 @@ Working set (files/ids/commands):
 - `tests/test_kv_cache_rope_scaffold_optional.py` (new)
 - `tests/test_mlx_runtime_optional.py`
 - `tests/test_model_differential.py`
+- `perf/audio_runs/incremental-file-10min-20260209T135727Z/mono_incremental_transcript.txt`
+- `perf/audio_runs/incremental-file-10min-20260209T135727Z/summary.json`
 - `voxmlx/generate.py`
 - `voxmlx/cache.py`
 - `voxmlx/model.py`
