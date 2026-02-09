@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: commit/push latest consolidated bug-fix batch and test updates.
-- Next: proceed with remaining performance-heavy items (encoder KV concat overhead and long-file streaming/offline unification).
+- Now: investigate new regression report: after a few hundred output tokens, generation appears to switch to mostly non-text/special tokens.
+- Next: isolate root cause with targeted toggles (STFT backend, temperature, model/prompt constants, streaming-vs-offline parity traces).
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -89,6 +89,10 @@ Done:
   - Added optional runtime tests:
     - `test_generate_flushes_final_pending_token`
     - `test_encode_matches_incremental_encode_step` (offline vs incremental encoder equivalence under streaming-like chunk sizes)
+- Candidate analysis for special-token drift:
+  - High-confidence candidate: default STFT backend now prefers FFT when available (`voxmlx/audio.py`), but prior experiments showed the FFT path materially worsened transcript deviation versus DFT.
+  - Candidate: prompt contract constants (`n_left_pad_tokens`, `n_delay_tokens`) remain hardcoded defaults; model-variant mismatch could push decoder into special-token-heavy regime mid-sequence.
+  - Candidate: encoder streaming attention semantics rely on MLX causal-mask behavior for `q_len != k_len`; currently covered by equivalence tests but still version-fragile.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -102,13 +106,14 @@ Done:
   - `python3 -m py_compile voxmlx/generate.py voxmlx/stream.py voxmlx/audio.py tests/test_mlx_runtime_optional.py` -> pass.
 
 Now:
-- Commit and push the latest bug-fix + test updates.
+- Provide prioritized potential-cause list + immediate verification toggles for the reported special-token drift.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
 - Address any regressions found during matrix runs.
 - Use the new KV/RoPE scaffold tests while implementing ring-buffer cache replacement.
 - Add encoder offline-vs-incremental equivalence test coverage.
+- If needed, add token-level instrumentation to log raw token IDs + special/non-special ratios over time.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
