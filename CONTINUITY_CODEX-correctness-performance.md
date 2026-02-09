@@ -25,10 +25,18 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: hand off new Mac Mini batch workflow (version matrix + sequential runner + docs).
+- Now: resumed continuity ledger for current session and continue Mac Mini batch workflow handoff (version matrix + sequential runner + docs).
 - Next: run the matrix on Mac Mini for 10x repeats per version and review aggregate stats.
 
 Done:
+- 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
+- 2026-02-09: Created `.venv313` with Python 3.13 and validated matrix-runner sanity command:
+  - `PYTHONPATH=. .venv313/bin/python /Users/crabbotix/gitrepos/voxmlx/scripts/run_version_matrix.py --matrix /Users/crabbotix/gitrepos/voxmlx/perf/version_matrix.json --campaign dryrun --dry-run` (exit 0)
+- 2026-02-09: Checked baseline-runtime prerequisites on current machine:
+  - Missing Python deps in `.venv313` (`ModuleNotFoundError: mlx`).
+  - Missing matrix-referenced local assets:
+    - model snapshot under `~/.cache/huggingface/hub/.../02eb0caeb9dafb554c17a72b93dbf40cd3736c31`
+    - audio fixtures under `../vllm/voxtral_test_audio/`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
@@ -49,7 +57,7 @@ Done:
 - Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
 
 Now:
-- Validate runner in `--dry-run` mode and publish usage for Mac Mini execution.
+- Preparing git handoff: push current continuity updates to a new `codex/*` branch, then keep watching the original scaffold branch for incoming updates.
 
 Next:
 - Execute on Mac Mini:
