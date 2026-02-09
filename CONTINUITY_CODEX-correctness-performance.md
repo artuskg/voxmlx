@@ -1,65 +1,70 @@
 Goal (incl. success criteria):
-- Add a maintainable scaffold to verify correctness now and protect correctness while optimizing performance later.
-- Success criteria: test harness, benchmark harness, and CI gates are added and runnable on a lightweight path.
+- Achieve at least 10% performance improvement on real audio tests while preserving transcription quality against a mono-derived ground truth target.
+- Success criteria:
+  - Use both files in `../vllm/voxtral_test_audio`.
+  - Create ground truth target from the mono file.
+  - Maintain a reproducible performance table in this ledger with labels, change chain, commit/config, and metrics.
+  - Report deviations from ground truth with meaningful metrics and verify deviations remain small enough.
 
 Constraints/Assumptions:
-- User requested a new branch for this work.
 - Keep changes compatible with existing Python package structure.
-- Heavy MLX/model-download paths should not be required for default CI checks.
+- Audio fixtures:
+  - `../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k.wav`
+  - `../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k.wav`
+- Ground truth target is derived from mono baseline run (`perf/ground_truth_mono.txt`).
+- Benchmark config for iteration speed/reproducibility: first 180s of each file + 10s warmup.
 
 Key decisions:
 - Use branch `codex/correctness-performance-scaffold`.
-- Introduce a pure helper contract module (`voxmlx/contracts.py`) and test that surface deterministically.
-- Make performance checks warn-only initially with an explicit baseline JSON and threshold checker.
+- Use `scripts/audio_eval.py` for reproducible runs (fixed clip length, warmup, model path, labeled outputs).
+- Use metrics:
+  - `norm_edit_distance`: character-level Levenshtein / GT chars
+  - `token_error_ratio`: token-level Levenshtein / GT tokens
+- Accept quality if deviation does not worsen versus baseline while speed improves.
 
 State:
-- Done: Branch + ledger created; scaffolding implemented; local tests/bench checks executed; commit created.
-- Now: Report completion and share branch/PR details.
-- Next: Optional follow-up is enabling strict perf gate timing and adding real model fixtures.
+- Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
+- Now: finalize commit/push with ledger + artifacts.
+- Next: optional larger-window/full-file confirmation runs.
 
 Done:
-- Added `voxmlx/contracts.py` with remap/format/sharding/prompt-token helpers.
-- Wired `voxmlx/__init__.py`, `voxmlx/weights.py`, and `voxmlx/convert.py` to shared contracts.
-- Added unit tests: `tests/test_contracts.py` and fixtures.
-- Added perf scripts: `scripts/bench_contracts.py`, `scripts/check_perf_regression.py`.
-- Added CI workflow: `.github/workflows/correctness-performance.yml`.
-- Added docs: `docs/correctness_performance.md` and README pointer.
-- Calibrated benchmark baseline: `perf/baseline_contracts.json`.
-- Committed changes: `b5e8a09`.
-- Added optional model-backed differential tests in `tests/test_model_differential.py` (env-gated).
-- Added project-local `AGENTS.md` and `RUNBOOK.md`.
-- Updated docs for optional model-backed lane and runbook pointer.
-- Updated `origin` to `https://github.com/artuskg/voxmlx.git`.
-- Pushed branch `codex/correctness-performance-scaffold` to fork remote.
+- Added deterministic correctness/perf scaffold and CI.
+- Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
+- Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
+- Added reproducible audio evaluator: `scripts/audio_eval.py`.
+- Added optimization chain:
+  - `voxmlx/generate.py`: reduced cache-clear frequency (`256` -> `2048` tokens)
+  - `voxmlx/audio.py`: cached STFT window + DFT basis (manual DFT path preserved)
+- Created mono ground truth: `perf/ground_truth_mono.txt`.
+- Stored run artifacts in `perf/audio_runs/<label>/`.
 
 Now:
-- Local validation is complete:
-  - `python3 -m unittest discover -s tests -p 'test_*.py' -v` (6 passed, 1 skipped by env gate)
-  - `python3 scripts/bench_contracts.py --iterations 5000 --output perf/current_contracts.json`
-  - `python3 scripts/check_perf_regression.py --baseline perf/baseline_contracts.json --current perf/current_contracts.json --threshold 0.20 --warn-only`
+- Commit ledger + run artifacts and push branch.
 
 Next:
-- If requested: add model-backed differential tests guarded behind optional env flags.
+- Optional: run same evaluation with longer clips (e.g., 600s) or full files to confirm scaling.
 
 Open questions (UNCONFIRMED if needed):
-- UNCONFIRMED: desired strictness/date for switching perf check from warn-only to failing gate.
+- UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
 
 Working set (files/ids/commands):
-- `voxmlx/contracts.py`
-- `voxmlx/__init__.py`
-- `voxmlx/weights.py`
-- `voxmlx/convert.py`
-- `tests/test_contracts.py`
-- `tests/fixtures/weight_remap_cases.json`
-- `scripts/bench_contracts.py`
-- `scripts/check_perf_regression.py`
-- `.github/workflows/correctness-performance.yml`
-- `docs/correctness_performance.md`
-- `perf/baseline_contracts.json`
-- `CONTINUITY_CODEX-correctness-performance.md`
-- Commit: `b5e8a09`
-- `git remote set-url origin https://github.com/artuskg/voxmlx.git`
-- `tests/test_model_differential.py`
-- `AGENTS.md`
-- `RUNBOOK.md`
-- Push target: `origin/codex/correctness-performance-scaffold`
+- `scripts/audio_eval.py`
+- `voxmlx/audio.py`
+- `voxmlx/generate.py`
+- `perf/ground_truth_mono.txt`
+- `perf/audio_runs/*/metrics.json`
+- `perf/audio_runs/*/*_transcript.txt`
+- `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label ...`
+- Baseline commit: `f4d7d09`
+- Optimized commit: `ea25661`
+
+Performance results table:
+| Label | Change summary | Commit | Model | Config | Audio | Time (s) | Speedup vs baseline | Deviation vs GT (norm edit / token err) | Notes |
+|---|---|---|---|---|---|---:|---:|---:|---|
+| env-setup-model-fetch | First dependency/model setup only | f4d7d09 | mlx-community/Voxtral-Mini-4B-Realtime-6bit | load-only | n/a | 2057.900 | n/a | n/a | One-time setup, not a transcription benchmark |
+| baseline-v1-clip180-create-gt | Baseline; ground truth generated from mono | f4d7d09 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 66.900 | 0.00% | 0.020814 / 0.031863 | Ground truth saved to `perf/ground_truth_mono.txt` |
+| opt-rfft-v1-clip180 | Experiment: FFT STFT path | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 65.814 | 1.62% | 0.040241 / 0.056373 | Speed gain small; deviation increased |
+| opt-rfft-clearcache2048-clip180 | FFT + clear_cache(2048) | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 50.536 | 24.46% | 0.040241 / 0.056373 | Speed strong, deviation increased |
+| opt-cachebasis-clearcache2048-clip180 | Revert to manual DFT; cache DFT basis + clear_cache(2048) | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 42.601 | 36.32% | 0.020814 / 0.031863 | Best experimental run; deviation back to baseline profile |
+| final-ea25661-clip180 | Committed optimization run #1 | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 51.083 | 23.64% | 0.020814 / 0.031863 | Meets speed target; baseline-equivalent deviation profile |
+| final-ea25661-clip180-r2 | Committed optimization run #2 (repeat) | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 57.770 | 13.65% | 0.020814 / 0.031863 | Repeat still above 10% target |

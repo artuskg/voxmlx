@@ -1,0 +1,35 @@
+{
+  "aggregate": {
+    "mean_norm_edit_distance": 0.020814061054579093,
+    "mean_token_error_ratio": 0.031862745098039214,
+    "total_elapsed_seconds": 57.770389249082655
+  },
+  "clip_seconds": 180,
+  "commit": "ea25661",
+  "created_ground_truth": false,
+  "generated_at_utc": "2026-02-09T09:10:40.936065+00:00",
+  "label": "final-ea25661-clip180-r2",
+  "model_path": "/Users/artus/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
+  "runs": [
+    {
+      "clip_seconds": 180,
+      "elapsed_seconds": 29.450935791013762,
+      "name": "mono",
+      "norm_edit_distance": 0.0,
+      "source_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k.wav",
+      "text_length_chars": 1081,
+      "token_count": 2260,
+      "token_error_ratio": 0.0
+    },
+    {
+      "clip_seconds": 180,
+      "elapsed_seconds": 28.319453458068892,
+      "name": "stereo",
+      "norm_edit_distance": 0.041628122109158186,
+      "source_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k.wav",
+      "text_length_chars": 1081,
+      "token_count": 2260,
+      "token_error_ratio": 0.06372549019607843
+    }
+  ]
+}
