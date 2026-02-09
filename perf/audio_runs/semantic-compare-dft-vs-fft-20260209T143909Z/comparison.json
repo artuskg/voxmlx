@@ -1,0 +1,161 @@
+{
+  "files": {
+    "reference_dft": "perf/audio_runs/incremental-file-10min-20260209T135727Z/mono_incremental_transcript.txt",
+    "fft": "perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/mono_incremental_transcript_fft.txt"
+  },
+  "counts": {
+    "ref_chars": 8452,
+    "fft_chars": 8454,
+    "ref_tokens": 1628,
+    "fft_tokens": 1628,
+    "ref_sentences": 138,
+    "fft_sentences": 139
+  },
+  "distance": {
+    "char_levenshtein": 14,
+    "char_norm_vs_ref": 0.001656412683388547,
+    "token_levenshtein": 14,
+    "token_norm_vs_ref": 0.0085995085995086
+  },
+  "change_counts": {
+    "total_non_equal_ops": 7,
+    "replace_ops": 7,
+    "insert_ops": 0,
+    "delete_ops": 0
+  },
+  "changes": [
+    {
+      "tag": "replace",
+      "ref_range": [
+        752,
+        754
+      ],
+      "fft_range": [
+        752,
+        754
+      ],
+      "ref_tokens": [
+        "attic",
+        "and"
+      ],
+      "fft_tokens": [
+        "attic.",
+        "And"
+      ]
+    },
+    {
+      "tag": "replace",
+      "ref_range": [
+        762,
+        764
+      ],
+      "fft_range": [
+        762,
+        764
+      ],
+      "ref_tokens": [
+        "me.",
+        "Think"
+      ],
+      "fft_tokens": [
+        "me",
+        "think"
+      ]
+    },
+    {
+      "tag": "replace",
+      "ref_range": [
+        1443,
+        1445
+      ],
+      "fft_range": [
+        1443,
+        1445
+      ],
+      "ref_tokens": [
+        "on.",
+        "Machine"
+      ],
+      "fft_tokens": [
+        "on",
+        "machine"
+      ]
+    },
+    {
+      "tag": "replace",
+      "ref_range": [
+        1456,
+        1458
+      ],
+      "fft_range": [
+        1456,
+        1458
+      ],
+      "ref_tokens": [
+        "on",
+        "and"
+      ],
+      "fft_tokens": [
+        "on.",
+        "And"
+      ]
+    },
+    {
+      "tag": "replace",
+      "ref_range": [
+        1469,
+        1471
+      ],
+      "fft_range": [
+        1469,
+        1471
+      ],
+      "ref_tokens": [
+        "Okay.",
+        "So"
+      ],
+      "fft_tokens": [
+        "Okay,",
+        "so"
+      ]
+    },
+    {
+      "tag": "replace",
+      "ref_range": [
+        1501,
+        1503
+      ],
+      "fft_range": [
+        1501,
+        1503
+      ],
+      "ref_tokens": [
+        "time",
+        "and"
+      ],
+      "fft_tokens": [
+        "time.",
+        "And"
+      ]
+    },
+    {
+      "tag": "replace",
+      "ref_range": [
+        1512,
+        1514
+      ],
+      "fft_range": [
+        1512,
+        1514
+      ],
+      "ref_tokens": [
+        "artifact",
+        "from"
+      ],
+      "fft_tokens": [
+        "artifact.",
+        "From"
+      ]
+    }
+  ]
+}

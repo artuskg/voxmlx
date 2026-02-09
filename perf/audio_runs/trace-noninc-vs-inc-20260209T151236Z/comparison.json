@@ -1,0 +1,1309 @@
+{
+  "generated_at_utc": "2026-02-09T15:15:58.077713+00:00",
+  "audio_path": "perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav",
+  "model_path": "/Users/artus/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
+  "clip_seconds": 120,
+  "stft_backend": "dft",
+  "temperature": 0.0,
+  "sliding_window": 8192,
+  "stats": {
+    "non_incremental": {
+      "method": "non_incremental",
+      "elapsed_seconds": 52.30709637503605,
+      "token_count": 1510,
+      "special_count": 1271,
+      "special_ratio": 0.8417218543046358,
+      "text_chars_keep": 20283,
+      "text_chars_ignore": 1081
+    },
+    "incremental": {
+      "method": "incremental",
+      "elapsed_seconds": 91.50335825001821,
+      "token_count": 1510,
+      "special_count": 1110,
+      "special_ratio": 0.7350993377483444,
+      "text_chars_keep": 18665,
+      "text_chars_ignore": 1782
+    }
+  },
+  "distance": {
+    "token_levenshtein": 384,
+    "token_norm_vs_incremental": 0.2543046357615894,
+    "char_levenshtein_keep": 3369,
+    "char_norm_keep_vs_incremental": 0.18049825877310474
+  },
+  "divergence": {
+    "first_token_divergence_index": 50,
+    "first_meaningful_divergence_index": 50,
+    "non_equal_span_count": 65,
+    "meaningful_span_count": 64
+  },
+  "diff_spans": [
+    {
+      "tag": "delete",
+      "noninc_range": [
+        50,
+        51
+      ],
+      "inc_range": [
+        50,
+        50
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        53,
+        53
+      ],
+      "inc_range": [
+        52,
+        53
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad]",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        60,
+        60
+      ],
+      "inc_range": [
+        60,
+        62
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        33,
+        11050
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_WORD] showing",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_word]showing",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        62,
+        63
+      ],
+      "inc_range": [
+        64,
+        64
+      ],
+      "noninc_ids": [
+        11050
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": " showing",
+      "inc_text_keep": "",
+      "noninc_norm": "showing",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        64,
+        65
+      ],
+      "inc_range": [
+        65,
+        65
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        169,
+        169
+      ],
+      "inc_range": [
+        169,
+        170
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        2430
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " then",
+      "noninc_norm": "",
+      "inc_norm": "then",
+      "meaningful": true
+    },
+    {
+      "tag": "replace",
+      "noninc_range": [
+        170,
+        172
+      ],
+      "inc_range": [
+        171,
+        172
+      ],
+      "noninc_ids": [
+        33,
+        2430
+      ],
+      "inc_ids": [
+        32
+      ],
+      "noninc_is_special": [
+        true,
+        false
+      ],
+      "inc_is_special": [
+        true
+      ],
+      "noninc_text_keep": "[STREAMING_WORD] then",
+      "inc_text_keep": "[STREAMING_PAD]",
+      "noninc_norm": "[streaming_word]then",
+      "inc_norm": "[streaming_pad]",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        204,
+        204
+      ],
+      "inc_range": [
+        204,
+        206
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        33,
+        13516
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_WORD] Use",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_word]use",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        206,
+        207
+      ],
+      "inc_range": [
+        208,
+        208
+      ],
+      "noninc_ids": [
+        13516
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": " Use",
+      "inc_text_keep": "",
+      "noninc_norm": "use",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        208,
+        209
+      ],
+      "inc_range": [
+        209,
+        209
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        214,
+        215
+      ],
+      "inc_range": [
+        214,
+        214
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        225,
+        225
+      ],
+      "inc_range": [
+        224,
+        225
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad]",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        244,
+        244
+      ],
+      "inc_range": [
+        244,
+        245
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        7418
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " write",
+      "noninc_norm": "",
+      "inc_norm": "write",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        246,
+        247
+      ],
+      "inc_range": [
+        247,
+        247
+      ],
+      "noninc_ids": [
+        7418
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": " write",
+      "inc_text_keep": "",
+      "noninc_norm": "write",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "replace",
+      "noninc_range": [
+        286,
+        287
+      ],
+      "inc_range": [
+        286,
+        287
+      ],
+      "noninc_ids": [
+        13968
+      ],
+      "inc_ids": [
+        3475
+      ],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": " Code",
+      "inc_text_keep": " code",
+      "noninc_norm": "code",
+      "inc_norm": "code",
+      "meaningful": false
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        343,
+        343
+      ],
+      "inc_range": [
+        343,
+        344
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad]",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        346,
+        347
+      ],
+      "inc_range": [
+        347,
+        347
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        357,
+        357
+      ],
+      "inc_range": [
+        357,
+        359
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32,
+        33
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD][STREAMING_WORD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad][streaming_word]",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        361,
+        362
+      ],
+      "inc_range": [
+        363,
+        363
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "replace",
+      "noninc_range": [
+        363,
+        365
+      ],
+      "inc_range": [
+        364,
+        366
+      ],
+      "noninc_ids": [
+        8934,
+        15553
+      ],
+      "inc_ids": [
+        2989,
+        23149
+      ],
+      "noninc_is_special": [
+        false,
+        false
+      ],
+      "inc_is_special": [
+        false,
+        false
+      ],
+      "noninc_text_keep": " crooked",
+      "inc_text_keep": " crickets",
+      "noninc_norm": "crooked",
+      "inc_norm": "crickets",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        367,
+        367
+      ],
+      "inc_range": [
+        368,
+        369
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        2118
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " app",
+      "noninc_norm": "",
+      "inc_norm": "app",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        368,
+        370
+      ],
+      "inc_range": [
+        370,
+        370
+      ],
+      "noninc_ids": [
+        33,
+        2118
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true,
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_WORD] app",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_word]app",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        393,
+        394
+      ],
+      "inc_range": [
+        393,
+        393
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        402,
+        402
+      ],
+      "inc_range": [
+        401,
+        403
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32,
+        33
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD][STREAMING_WORD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad][streaming_word]",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        403,
+        404
+      ],
+      "inc_range": [
+        404,
+        404
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        409,
+        411
+      ],
+      "inc_range": [
+        409,
+        409
+      ],
+      "noninc_ids": [
+        1294,
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        false,
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": " in[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "in[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        413,
+        413
+      ],
+      "inc_range": [
+        411,
+        412
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        1294
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " in",
+      "noninc_norm": "",
+      "inc_norm": "in",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        424,
+        424
+      ],
+      "inc_range": [
+        423,
+        426
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32,
+        32,
+        33
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        true,
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD][STREAMING_PAD][STREAMING_WORD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad][streaming_pad][streaming_word]",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        425,
+        426
+      ],
+      "inc_range": [
+        427,
+        427
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        449,
+        450
+      ],
+      "inc_range": [
+        450,
+        450
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        461,
+        461
+      ],
+      "inc_range": [
+        461,
+        463
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32,
+        33
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD][STREAMING_WORD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad][streaming_word]",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        462,
+        463
+      ],
+      "inc_range": [
+        464,
+        464
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        475,
+        476
+      ],
+      "inc_range": [
+        476,
+        476
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        479,
+        479
+      ],
+      "inc_range": [
+        479,
+        480
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad]",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        487,
+        487
+      ],
+      "inc_range": [
+        488,
+        490
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        33,
+        5972
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_WORD] reason",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_word]reason",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        489,
+        490
+      ],
+      "inc_range": [
+        492,
+        492
+      ],
+      "noninc_ids": [
+        5972
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": " reason",
+      "inc_text_keep": "",
+      "noninc_norm": "reason",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "replace",
+      "noninc_range": [
+        491,
+        492
+      ],
+      "inc_range": [
+        493,
+        494
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [
+        2118
+      ],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": " app",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "app",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        494,
+        495
+      ],
+      "inc_range": [
+        496,
+        496
+      ],
+      "noninc_ids": [
+        2118
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": " app",
+      "inc_text_keep": "",
+      "noninc_norm": "app",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        496,
+        496
+      ],
+      "inc_range": [
+        497,
+        498
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        1605
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " not",
+      "noninc_norm": "",
+      "inc_norm": "not",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        497,
+        499
+      ],
+      "inc_range": [
+        499,
+        499
+      ],
+      "noninc_ids": [
+        33,
+        1605
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true,
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_WORD] not",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_word]not",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        503,
+        505
+      ],
+      "inc_range": [
+        503,
+        503
+      ],
+      "noninc_ids": [
+        33,
+        3151
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true,
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_WORD] down",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_word]down",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        511,
+        511
+      ],
+      "inc_range": [
+        509,
+        512
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        94596,
+        32,
+        33
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false,
+        true,
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " downloads[STREAMING_PAD][STREAMING_WORD]",
+      "noninc_norm": "",
+      "inc_norm": "downloads[streaming_pad][streaming_word]",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        513,
+        514
+      ],
+      "inc_range": [
+        514,
+        514
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        523,
+        526
+      ],
+      "inc_range": [
+        523,
+        523
+      ],
+      "noninc_ids": [
+        33,
+        11205,
+        1046
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true,
+        false,
+        false
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_WORD] package.",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_word]package",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        528,
+        528
+      ],
+      "inc_range": [
+        525,
+        527
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        46310,
+        1046
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false,
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " packaging.",
+      "noninc_norm": "",
+      "inc_norm": "packaging",
+      "meaningful": true
+    },
+    {
+      "tag": "replace",
+      "noninc_range": [
+        529,
+        530
+      ],
+      "inc_range": [
+        528,
+        529
+      ],
+      "noninc_ids": [
+        1593
+      ],
+      "inc_ids": [
+        32
+      ],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [
+        true
+      ],
+      "noninc_text_keep": " this",
+      "inc_text_keep": "[STREAMING_PAD]",
+      "noninc_norm": "this",
+      "inc_norm": "[streaming_pad]",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        532,
+        532
+      ],
+      "inc_range": [
+        531,
+        532
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        1593
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": " this",
+      "noninc_norm": "",
+      "inc_norm": "this",
+      "meaningful": true
+    },
+    {
+      "tag": "delete",
+      "noninc_range": [
+        533,
+        534
+      ],
+      "inc_range": [
+        533,
+        533
+      ],
+      "noninc_ids": [
+        32
+      ],
+      "inc_ids": [],
+      "noninc_is_special": [
+        true
+      ],
+      "inc_is_special": [],
+      "noninc_text_keep": "[STREAMING_PAD]",
+      "inc_text_keep": "",
+      "noninc_norm": "[streaming_pad]",
+      "inc_norm": "",
+      "meaningful": true
+    },
+    {
+      "tag": "insert",
+      "noninc_range": [
+        540,
+        540
+      ],
+      "inc_range": [
+        539,
+        541
+      ],
+      "noninc_ids": [],
+      "inc_ids": [
+        32,
+        33
+      ],
+      "noninc_is_special": [],
+      "inc_is_special": [
+        true,
+        true
+      ],
+      "noninc_text_keep": "",
+      "inc_text_keep": "[STREAMING_PAD][STREAMING_WORD]",
+      "noninc_norm": "",
+      "inc_norm": "[streaming_pad][streaming_word]",
+      "meaningful": true
+    },
+    {
+      "tag": "replace",
+      "noninc_range": [
+        555,
+        556
+      ],
+      "inc_range": [
+        556,
+        557
+      ],
+      "noninc_ids": [
+        7442
+      ],
+      "inc_ids": [
+        34898
+      ],
+      "noninc_is_special": [
+        false
+      ],
+      "inc_is_special": [
+        false
+      ],
+      "noninc_text_keep": " actually",
+      "inc_text_keep": " actively",
+      "noninc_norm": "actually",
+      "inc_norm": "actively",
+      "meaningful": true
+    }
+  ]
+}
