@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: completed DFT-vs-FFT comparison runs for all incoming implementations (3x each).
-- Next: decide backend policy (`dft` preferred for speed/stability in these runs) and investigate why FFT changed stereo quality metrics.
+- Now: blocked on requested incremental-10s matrix run because referenced scripts/config are not present after pull/fetch in available remote branches.
+- Next: resolve commit/branch containing `incremental_file_eval.py`, `run_incremental_10s_matrix.py`, and `perf/incremental_10s_matrix.json`, then execute dry-run + full run.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -190,6 +190,13 @@ Done:
     - Levenshtein `3056`, normalized `0.361571`
     - sequence ratio `0.131679`
   - Even after lowercase/alnum/whitespace normalization, distance remains high (`0.343792` normalized), so divergence is semantic/content-level, not just punctuation/casing.
+- 2026-02-09: Pull-and-run request for incremental 10s matrix is currently blocked:
+  - Executed `git pull --rebase --autostash` and fetched updated refs (including `origin/codex/correctness-performance-scaffold` -> `775fbbd`).
+  - Searched all fetched remote branches and full local git history; none contain:
+    - `scripts/incremental_file_eval.py`
+    - `scripts/run_incremental_10s_matrix.py`
+    - `perf/incremental_10s_matrix.json`
+  - Current docs in fetched branches still reference `scripts/run_version_matrix.py` + `perf/version_matrix.json`, not the incremental-10s files.
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
@@ -210,10 +217,13 @@ Done:
 - Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
 
 Now:
-- Share DFT-vs-FFT timing and metric deltas for the same incoming implementations.
+- Awaiting correct branch/commit with incremental-10s runner files to execute requested dry-run and full sequential campaign.
 
 Next:
-- Continue with `dft` for benchmark speed runs and perform targeted inspection of FFT-induced stereo text differences.
+- After locating the correct commit, run:
+  - `scripts/run_incremental_10s_matrix.py --dry-run`
+  - `scripts/run_incremental_10s_matrix.py` full run
+  and report `summary.json`, `summary.csv`, and transcript outputs.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
