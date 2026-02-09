@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: generated full 10-minute incremental transcript on reference mono and stored artifacts under `perf/audio_runs/`.
-- Next: compare this incremental output against baseline/offline transcripts and triage mismatch root cause.
+- Now: set the 10-minute incremental mono transcript as new ground truth text.
+- Next: recompute/report metrics against updated ground truth as needed.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -107,6 +107,11 @@ Done:
   - summary: `perf/audio_runs/incremental-file-10min-20260209T135727Z/summary.json`
   - config: `method=incremental_file_pipeline`, `stft_backend=dft`
   - elapsed: `374.227s`, tokens=`7510`, chars=`8452`
+- Ground truth updated:
+  - `perf/ground_truth_mono.txt` now equals incremental 10-minute output.
+  - new SHA-256: `8febd5d6bf793ce775a9e3f4372c66b51e19fd1d476a58ce8be13abc63936e79`
+  - previous ground truth backed up at `perf/ground_truth_mono.pre_incremental_10min.txt`
+  - previous SHA-256: `c884ae4d490915b3d5bd6cfc61d1cb37485d58df1b4cd92404ec2fbb95348e5f`
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -127,7 +132,7 @@ Done:
     - observed: `abs_err = 2.4375` (threshold `1e-4`), shape matched.
 
 Now:
-- Share generated incremental transcript path and metadata with user.
+- Explain STFT backend options and current tradeoffs.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -137,6 +142,7 @@ Next:
 - If needed, add token-level instrumentation to log raw token IDs + special/non-special ratios over time.
 - Investigate encoder cached attention alignment (`mask="causal"` with `q_len != k_len`) as primary suspect for contract failure.
 - Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
+- Rebaseline existing perf run deviation metrics against updated ground truth.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -147,6 +153,8 @@ Working set (files/ids/commands):
 - `tests/test_model_differential.py`
 - `perf/audio_runs/incremental-file-10min-20260209T135727Z/mono_incremental_transcript.txt`
 - `perf/audio_runs/incremental-file-10min-20260209T135727Z/summary.json`
+- `perf/ground_truth_mono.txt`
+- `perf/ground_truth_mono.pre_incremental_10min.txt`
 - `voxmlx/generate.py`
 - `voxmlx/cache.py`
 - `voxmlx/model.py`
