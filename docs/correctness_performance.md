@@ -76,9 +76,11 @@ For real-audio perf/quality runs against the two Voxtral test audio files, use:
 
 ```bash
 PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py \
-  --label baseline-v1-clip180-create-gt \
+  --label baseline-v1-clip600-create-gt \
   --commit $(git rev-parse --short HEAD) \
-  --clip-seconds 180 \
+  --mono-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav \
+  --stereo-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav \
+  --clip-seconds 600 \
   --create-ground-truth
 ```
 
@@ -88,7 +90,9 @@ Then run comparison labels using the saved ground truth:
 PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py \
   --label <label> \
   --commit $(git rev-parse --short HEAD) \
-  --clip-seconds 180 \
+  --mono-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav \
+  --stereo-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav \
+  --clip-seconds 600 \
   --ground-truth-path perf/ground_truth_mono.txt
 ```
 
@@ -97,7 +101,7 @@ For repeated multi-version runs on a dedicated machine (for better stats under n
 ```bash
 PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
   --matrix perf/version_matrix.json \
-  --campaign macmini-voxtral-clip180
+  --campaign macmini-voxtral-clip600
 ```
 
 This runs each configured version sequentially and writes aggregate outputs to:

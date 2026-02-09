@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: hand off new Mac Mini batch workflow (version matrix + sequential runner + docs).
-- Next: run the matrix on Mac Mini for 10x repeats per version and review aggregate stats.
+- Now: shorten reference audio to 10 minutes and update matrix/workflow paths, then push.
+- Next: run updated 10-minute matrix on Mac Mini for 10x repeats per version.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -47,14 +47,19 @@ Done:
 - Added matrix definition `perf/version_matrix.json` (baseline + final refs, repeat count, clip config, paths).
 - Updated `RUNBOOK.md` and `docs/correctness_performance.md` with Mac Mini workflow commands and output locations.
 - Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
+- Created 10-minute in-repo reference audio clips:
+  - `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav`
+  - `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav`
+- Updated matrix to 10-minute setup:
+  - `perf/version_matrix.json`: `clip_seconds=600`, matrix name `voxtral_clip600`, local reference-audio paths.
+- Updated docs/runbook examples to 10-minute reference audio workflow.
+- Validated `scripts/run_version_matrix.py` with `--dry-run` against updated matrix.
 
 Now:
-- Validate runner in `--dry-run` mode and publish usage for Mac Mini execution.
+- Commit and push 10-minute reference audio + matrix/docs updates.
 
 Next:
-- Execute on Mac Mini:
-  - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --campaign <campaign-name>`
-- Compare `perf/batch_runs/<campaign>/summary.json` means/stdevs and decide next optimization targets.
+- Push updated reference clips and matrix to origin, then execute on Mac Mini.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
