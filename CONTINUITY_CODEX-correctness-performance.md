@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: clarify/diagnose encoder cached-causal-mask sensitivity (user asked for deeper explanation).
-- Next: if needed, add explicit mask contract tests tied to current MLX behavior.
+- Now: new model-backed contract test added for offline `encode` vs incremental `encode_step` on reference mono; current result indicates a real mismatch under real model/audio.
+- Next: triage and fix the mismatch (likely cached encoder attention/mask behavior), then make the contract pass.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -94,6 +94,13 @@ Done:
   - Candidate: prompt contract constants (`n_left_pad_tokens`, `n_delay_tokens`) remain hardcoded defaults; model-variant mismatch could push decoder into special-token-heavy regime mid-sequence.
   - Candidate: encoder streaming attention semantics rely on MLX causal-mask behavior for `q_len != k_len`; currently covered by equivalence tests but still version-fragile.
   - Observed local runtime: `mlx.core` version `0.30.6`.
+- Added real-audio encode contract test in `tests/test_model_differential.py`:
+  - `test_encode_contract_reference_mono_offline_vs_incremental`
+  - uses repository reference mono by default: `perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav`
+  - chunks audio with real streaming size (`SAMPLES_PER_TOKEN`) and compares:
+    - offline path: `pad_audio -> log_mel_spectrogram -> model.encode`
+    - incremental path: `log_mel_spectrogram_step + model.encode_step`
+  - configurable clip duration via `VOXMLX_TEST_REFERENCE_MONO_MAX_SECONDS` (default `600`).
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -105,9 +112,16 @@ Done:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional tests.test_kv_cache_rope_scaffold_optional -v` -> pass.
   - `python3 -m py_compile voxmlx/generate.py voxmlx/stream.py voxmlx/audio.py tests/test_mlx_runtime_optional.py` -> pass.
+  - `python3 -m py_compile tests/test_model_differential.py` -> pass.
+  - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
+  - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional tests.test_kv_cache_rope_scaffold_optional -v` -> pass.
+  - targeted model-backed run (30s smoke on reference mono) currently FAILS, demonstrating contract breach:
+    - command:
+      - `VOXMLX_ENABLE_MODEL_TESTS=1 VOXMLX_TEST_MODEL_PATH=/Users/artus/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31 VOXMLX_TEST_AUDIO_PATH=/Users/artus/GitRepos/voxmlx/perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav VOXMLX_TEST_REFERENCE_MONO_MAX_SECONDS=30 PYTHONPATH=. .venv313/bin/python -m unittest tests.test_model_differential.ModelDifferentialTest.test_encode_contract_reference_mono_offline_vs_incremental -v`
+    - observed: `abs_err = 2.4375` (threshold `1e-4`), shape matched.
 
 Now:
-- Provide prioritized potential-cause list + immediate verification toggles for the reported special-token drift.
+- Use the new failing contract to guide root-cause fixes in encoder incremental path.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -115,6 +129,7 @@ Next:
 - Use the new KV/RoPE scaffold tests while implementing ring-buffer cache replacement.
 - Add encoder offline-vs-incremental equivalence test coverage.
 - If needed, add token-level instrumentation to log raw token IDs + special/non-special ratios over time.
+- Investigate encoder cached attention alignment (`mask="causal"` with `q_len != k_len`) as primary suspect for contract failure.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -122,6 +137,7 @@ Open questions (UNCONFIRMED if needed):
 Working set (files/ids/commands):
 - `tests/test_kv_cache_rope_scaffold_optional.py` (new)
 - `tests/test_mlx_runtime_optional.py`
+- `tests/test_model_differential.py`
 - `voxmlx/generate.py`
 - `voxmlx/cache.py`
 - `voxmlx/model.py`
