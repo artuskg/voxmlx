@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: comparing newly-updated correctness-branch reference transcript against captured `voxtral.c` output.
-- Next: use this external reference comparison to tune `voxmlx` decode/text filtering behavior and benchmarking quality gates.
+- Now: completed 3x sequential timing runs for incoming implementations using the updated correctness-branch reference transcript as GT.
+- Next: decide which incoming implementation to promote based on timing stability and then continue decode/text-quality alignment work.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -131,6 +131,26 @@ Done:
   - After lowercasing + punctuation stripping + whitespace normalization, remaining distance is very small:
     - Levenshtein `11` over ~`8.2k` chars (`~0.13%` normalized), indicating near-match with mostly formatting/tokenization differences.
   - Prior pre-incremental GT remains far from `voxtral.c` output (`1081` chars vs `8461`; distance `7389`).
+- 2026-02-09: Pulled again per user request and confirmed correctness branch advanced to `cb81d75`.
+- 2026-02-09: Ran sequential incoming-only timing campaign with `3` runs per implementation:
+  - Command:
+    - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix /tmp/voxmlx_matrix_incoming_r3.json --campaign incoming-only-clip600-r3-correctnessgt --repeats 3 --python /Users/crabbotix/gitrepos/voxmlx/.venv313/bin/python --version-ids incoming_59735f8,incoming_cce41e1,incoming_dc994b1 --skip-ground-truth-refresh`
+  - Ground truth used:
+    - `/tmp/ground_truth_mono_correctness_cb81d75.txt` (exported from `origin/codex/correctness-performance-scaffold:perf/ground_truth_mono.txt`)
+  - Output:
+    - `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r3-correctnessgt/summary.json`
+    - `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r3-correctnessgt/runs.csv`
+  - Timing (total mono+stereo elapsed, mean of 3 runs):
+    - `incoming_59735f8`: `315.152s` (runs: `319.719`, `320.351`, `305.385`; stdev `6.911s`)
+    - `incoming_cce41e1`: `305.053s` (runs: `306.058`, `307.882`, `301.218`; stdev `2.812s`)
+    - `incoming_dc994b1`: `304.737s` (runs: `299.039`, `298.803`, `316.368`; stdev `8.225s`)
+  - Relative speed vs fastest mean (`incoming_dc994b1`):
+    - `incoming_59735f8`: `+3.418%` slower
+    - `incoming_cce41e1`: `+0.104%` slower
+    - `incoming_dc994b1`: fastest mean
+  - Quality metrics against new reference GT (all three versions/runs unchanged):
+    - `mean_norm_edit_distance=0.872752`
+    - `mean_token_error_ratio=0.890049`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
@@ -151,10 +171,10 @@ Done:
 - Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
 
 Now:
-- Integrate new external reference transcript (correctness branch) as the quality anchor for `voxmlx` comparisons.
+- Share 3x timing table for incoming implementations and highlight fastest/most stable variants.
 
 Next:
-- Add/adjust correctness checks so long-form transcript evaluation is measured against reference text, not model-derived GT.
+- Choose promotion candidate (`dc994b1` fastest mean vs `cce41e1` lower variance) and proceed with decode/text-quality remediation.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -174,6 +194,8 @@ Working set (files/ids/commands):
 - `/Volumes/BigStore/voxtral-model/*`
 - `/Users/crabbotix/gitrepos/voxmlx/perf/voxtralc_compare/20260209_145139/*`
 - `origin/codex/correctness-performance-scaffold:perf/ground_truth_mono.txt`
+- `/tmp/voxmlx_matrix_incoming_r3.json`
+- `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r3-correctnessgt/*`
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
 
