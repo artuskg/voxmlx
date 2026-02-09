@@ -24,8 +24,13 @@
 - Perf regression check:
   - `python3 scripts/check_perf_regression.py --baseline perf/baseline_contracts.json --current perf/current_contracts.json --threshold 0.20 --warn-only`
 - Audio correctness/performance eval (segment-based, reproducible):
-  - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label baseline-v1-clip180-create-gt --commit $(git rev-parse --short HEAD) --clip-seconds 180 --create-ground-truth`
-  - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label <label> --commit $(git rev-parse --short HEAD) --clip-seconds 180 --ground-truth-path perf/ground_truth_mono.txt`
+  - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label baseline-v1-clip600-create-gt --commit $(git rev-parse --short HEAD) --mono-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --stereo-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav --clip-seconds 600 --create-ground-truth`
+  - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label <label> --commit $(git rev-parse --short HEAD) --mono-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --stereo-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav --clip-seconds 600 --ground-truth-path perf/ground_truth_mono.txt`
+- Non-incremental vs incremental divergence trace (debug, low-overhead token tracing):
+  - `VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python scripts/trace_nonincremental_vs_incremental.py --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --clip-seconds 120`
+  - Focused step-through around first divergence token:
+    - `VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python scripts/trace_nonincremental_vs_incremental.py --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --clip-seconds 120 --focus-token-index 50 --focus-window 2 --trace-topk 8`
+  - Note: keep `--clip-seconds <= 120` for non-incremental path diagnostics.
 
 ### Optional model-backed differential tests
 
@@ -58,7 +63,7 @@ Actual run (strictly sequential):
 ```bash
 PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py \
   --matrix perf/version_matrix.json \
-  --campaign macmini-voxtral-clip180
+  --campaign macmini-voxtral-clip600
 ```
 
 Run only incoming/new version IDs (reuse existing ground truth, do not rerun baseline):

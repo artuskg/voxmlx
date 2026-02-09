@@ -1,0 +1,95 @@
+{
+  "clip_seconds": 20,
+  "stage_parity": {
+    "mel": {
+      "len_a": 2391,
+      "len_b": 2391,
+      "compared": 2391,
+      "max_abs_global": 6.151199340820312e-05,
+      "mean_abs_global_mean": 2.5663156387996394e-07,
+      "max_abs_p95": 1.2636184692382812e-05,
+      "l2_global_mean": 6.892801250074295e-06,
+      "first_over_threshold": {
+        "1e-06": 278,
+        "1e-05": 279,
+        "0.0001": null,
+        "0.001": null,
+        "0.01": null,
+        "0.1": null,
+        "1.0": null
+      }
+    },
+    "conv1_out": {
+      "len_a": 2391,
+      "len_b": 2391,
+      "compared": 2391,
+      "max_abs_global": 0.00390625,
+      "mean_abs_global_mean": 8.39954182108951e-07,
+      "max_abs_p95": 0.0009765625,
+      "l2_global_mean": 0.0001918033920394267,
+      "first_over_threshold": {
+        "1e-06": 280,
+        "1e-05": 280,
+        "0.0001": 280,
+        "0.001": 281,
+        "0.01": null,
+        "0.1": null,
+        "1.0": null
+      }
+    },
+    "conv2_out": {
+      "len_a": 1195,
+      "len_b": 1195,
+      "compared": 1195,
+      "max_abs_global": 1.953125,
+      "mean_abs_global_mean": 0.030532995030229375,
+      "max_abs_p95": 0.7941406249999998,
+      "l2_global_mean": 1.4746869203685218,
+      "first_over_threshold": {
+        "1e-06": 134,
+        "1e-05": 134,
+        "0.0001": 134,
+        "0.001": 134,
+        "0.01": 134,
+        "0.1": 135,
+        "1.0": 169
+      }
+    },
+    "encoder_transformer_out": {
+      "len_a": 1195,
+      "len_b": 1195,
+      "compared": 1195,
+      "max_abs_global": 5.40625,
+      "mean_abs_global_mean": 0.06370809395596869,
+      "max_abs_p95": 0.546875,
+      "l2_global_mean": 2.8656408807831704,
+      "first_over_threshold": {
+        "1e-06": 0,
+        "1e-05": 0,
+        "0.0001": 0,
+        "0.001": 0,
+        "0.01": 0,
+        "0.1": 6,
+        "1.0": 168
+      }
+    },
+    "adapter_embeds": {
+      "len_a": 298,
+      "len_b": 298,
+      "compared": 298,
+      "max_abs_global": 1.125,
+      "mean_abs_global_mean": 0.013386505269781442,
+      "max_abs_p95": 0.4511718749999991,
+      "l2_global_mean": 0.9882513033038618,
+      "first_over_threshold": {
+        "1e-06": 0,
+        "1e-05": 0,
+        "0.0001": 0,
+        "0.001": 0,
+        "0.01": 2,
+        "0.1": 18,
+        "1.0": 48
+      }
+    }
+  }
+}

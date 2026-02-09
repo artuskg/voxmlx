@@ -1,12 +1,12 @@
 {
-  "matrix_name": "voxtral_clip180",
+  "matrix_name": "voxtral_clip600",
   "baseline_version_id": "baseline_v2",
   "repeats": 10,
-  "clip_seconds": 180,
+  "clip_seconds": 600,
   "warmup_seconds": 10,
   "model_path": "~/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
-  "mono_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k.wav",
-  "stereo_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k.wav",
+  "mono_path": "perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav",
+  "stereo_path": "perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav",
   "ground_truth_path": "perf/ground_truth_mono.txt",
   "versions": [
     {

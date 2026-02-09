@@ -77,7 +77,8 @@ class VoxtralRealtime(nn.Module):
         # Truncate T to be even (for conv stride 2)
         T = mel.shape[1]
         if T % 2 != 0:
-            mel = mel[:, 1:]
+            # Keep earliest alignment by dropping trailing frame.
+            mel = mel[:, :-1]
 
         x = self.encoder(mel)  # [1, T/2, encoder_dim]
         x = x[0]  # [T/2, encoder_dim]
@@ -86,7 +87,8 @@ class VoxtralRealtime(nn.Module):
         L = x.shape[0]
         remainder = L % self.downsample_factor
         if remainder != 0:
-            x = x[remainder:]
+            # Keep earliest alignment by dropping trailing remainder.
+            x = x[:-remainder]
             L = x.shape[0]
 
         # Reshape: [T/2, 1280] -> [T/8, 5120]
@@ -118,8 +120,11 @@ class VoxtralRealtime(nn.Module):
 
         # Create encoder cache on first call
         if encoder_cache is None:
+            window = int(self.encoder.sliding_window)
+            if window <= 0 or window >= 10_000:
+                raise ValueError(f"Unexpected encoder sliding_window: {window}")
             encoder_cache = [
-                RotatingKVCache(100_000)
+                RotatingKVCache(window)
                 for _ in range(len(self.encoder.layers))
             ]
 

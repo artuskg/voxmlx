@@ -1,0 +1,13 @@
+{
+  "audio_path": "/Users/artus/GitRepos/voxmlx/perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav",
+  "model_path": "/Users/artus/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
+  "method": "incremental_file_pipeline",
+  "stft_backend": "fft",
+  "elapsed_seconds": 614.7011716250563,
+  "token_count": 7510,
+  "char_count": 8454,
+  "n_left_pad_tokens": 32,
+  "n_delay_tokens": 6,
+  "output_path": "/Users/artus/GitRepos/voxmlx/perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/mono_incremental_transcript_fft.txt",
+  "generated_at_utc": "2026-02-09T14:32:15.606847+00:00"
+}
