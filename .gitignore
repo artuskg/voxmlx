@@ -204,6 +204,9 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Local perf outputs
+perf/current_contracts.json
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

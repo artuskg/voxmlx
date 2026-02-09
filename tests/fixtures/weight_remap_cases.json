@@ -1,0 +1,34 @@
+[
+  {
+    "input": "whisper_encoder.conv_layers.0.conv.weight",
+    "expected": "encoder.conv1.weight"
+  },
+  {
+    "input": "whisper_encoder.transformer.layers.7.attention.wq.weight",
+    "expected": "encoder.layers.7.attention.q_proj.weight"
+  },
+  {
+    "input": "audio_language_projection.2.weight",
+    "expected": "adapter.w_out.weight"
+  },
+  {
+    "input": "layers.3.feed_forward.w2.weight",
+    "expected": "language_model.layers.3.mlp.down_proj.weight"
+  },
+  {
+    "input": "layers.10.ada_rms_norm_t_cond.2.weight",
+    "expected": "language_model.layers.10.ada_norm.linear_out.weight"
+  },
+  {
+    "input": "norm.weight",
+    "expected": "language_model.norm.weight"
+  },
+  {
+    "input": "mm_whisper_embeddings.layers.1.attention.wk.weight",
+    "expected": "language_model.layers.1.attention.k_proj.weight"
+  },
+  {
+    "input": "unknown.weight",
+    "expected": null
+  }
+]

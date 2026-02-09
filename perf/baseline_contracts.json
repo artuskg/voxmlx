@@ -1,0 +1,20 @@
+{
+  "benchmarks": {
+    "make_weight_shards": {
+      "iterations": 20000,
+      "per_op_us": 19.911762498668395,
+      "total_seconds": 0.3982352499733679
+    },
+    "remap_known": {
+      "iterations": 20000,
+      "per_op_us": 8.899079149705358,
+      "total_seconds": 0.17798158299410716
+    },
+    "remap_unknown": {
+      "iterations": 20000,
+      "per_op_us": 10.35341044771485,
+      "total_seconds": 0.207068208954297
+    }
+  },
+  "generated_at_utc": "2026-02-09T07:08:04.502057+00:00"
+}

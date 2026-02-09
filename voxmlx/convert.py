@@ -9,8 +9,9 @@ import mlx.core as mx
 import mlx.nn as nn
 from mlx.utils import tree_flatten, tree_reduce
 
+from .contracts import make_weight_shards
 from .model import VoxtralRealtime
-from .weights import download_model, load_model, _remap_name, _is_conv_weight
+from .weights import download_model, load_model
 
 
 def _get_total_parameters(model):
@@ -35,17 +36,7 @@ def _compute_bits_per_weight(model):
 
 
 def _make_shards(weights: dict, max_file_size_gb: int = 5) -> list:
-    max_file_size_bytes = max_file_size_gb << 30
-    shards = []
-    shard, shard_size = {}, 0
-    for k, v in weights.items():
-        if shard_size + v.nbytes > max_file_size_bytes:
-            shards.append(shard)
-            shard, shard_size = {}, 0
-        shard[k] = v
-        shard_size += v.nbytes
-    shards.append(shard)
-    return shards
+    return make_weight_shards(weights, max_file_size_gb=max_file_size_gb)
 
 
 def _save_model(save_path: Path, model: nn.Module):

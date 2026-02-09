@@ -78,3 +78,8 @@ from voxmlx import transcribe
 text = transcribe("audio.flac")
 print(text)
 ```
+
+## Correctness and Performance Workflow
+
+For test and benchmark commands used to guard correctness while optimizing performance, see:
+`docs/correctness_performance.md`.
