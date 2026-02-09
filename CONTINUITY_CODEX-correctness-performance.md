@@ -13,9 +13,9 @@ Key decisions:
 - Make performance checks warn-only initially with an explicit baseline JSON and threshold checker.
 
 State:
-- Done: Branch + ledger created; scaffolding implemented; local tests/bench checks executed.
-- Now: Final verification, commit, push, and report.
-- Next: Optional expansion into differential/model-level tests once lightweight fixtures are available.
+- Done: Branch + ledger created; scaffolding implemented; local tests/bench checks executed; commit created.
+- Now: Report outcomes and handle remote push permissions.
+- Next: Push branch to a writable remote or grant access to `awni/voxmlx`.
 
 Done:
 - Added `voxmlx/contracts.py` with remap/format/sharding/prompt-token helpers.
@@ -25,14 +25,16 @@ Done:
 - Added CI workflow: `.github/workflows/correctness-performance.yml`.
 - Added docs: `docs/correctness_performance.md` and README pointer.
 - Calibrated benchmark baseline: `perf/baseline_contracts.json`.
+- Committed changes: `b5e8a09`.
 
 Now:
-- Verify git diff/status, then commit and push the branch.
+- Push blocked: `git push -u origin codex/correctness-performance-scaffold` returned HTTP 403 (no write permission to `awni/voxmlx`).
 
 Next:
 - If requested: add model-backed differential tests guarded behind optional env flags.
 
 Open questions (UNCONFIRMED if needed):
+- UNCONFIRMED: writable remote for push (fork or granted collaborator permission).
 - UNCONFIRMED: desired strictness/date for switching perf check from warn-only to failing gate.
 
 Working set (files/ids/commands):
@@ -48,3 +50,4 @@ Working set (files/ids/commands):
 - `docs/correctness_performance.md`
 - `perf/baseline_contracts.json`
 - `CONTINUITY_CODEX-correctness-performance.md`
+- Commit: `b5e8a09`
