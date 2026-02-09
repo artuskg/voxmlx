@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: local handoff branch created for ledger continuity updates; upstream push is blocked by repository permission on this machine.
-- Next: obtain writable remote access (or alternate remote) and push `codex/continuity-ledger-sync`; keep tracking `codex/correctness-performance-scaffold` for incoming changes.
+- Now: continuity updates are pushed on `codex/continuity-ledger-sync`; keep tracking `codex/correctness-performance-scaffold` for incoming updates.
+- Next: run Mac Mini non-dry campaign and periodically refresh branch-monitor snapshots.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -43,6 +43,11 @@ Done:
   - SSH fallback also failed (`Host key verification failed`)
 - 2026-02-09: Monitoring snapshot for source branch after `git fetch --all --prune`:
   - `codex/correctness-performance-scaffold` is in sync with `origin/codex/correctness-performance-scaffold` (ahead/behind: `0/0`)
+- 2026-02-09: Push unblocked and completed:
+  - `git push -u origin codex/continuity-ledger-sync` succeeded (new remote branch created; tracking set).
+- 2026-02-09: Post-push monitoring snapshot after `git fetch --all --prune`:
+  - `codex/correctness-performance-scaffold` vs `origin/codex/correctness-performance-scaffold`: `0/0`
+  - `codex/continuity-ledger-sync` vs `origin/codex/continuity-ledger-sync`: `0/0`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
