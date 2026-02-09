@@ -21,11 +21,12 @@ Key decisions:
   - `norm_edit_distance`: character-level Levenshtein / GT chars
   - `token_error_ratio`: token-level Levenshtein / GT tokens
 - Accept quality if deviation does not worsen versus baseline while speed improves.
+- User requirement: all test/benchmark runs must be executed sequentially (never in parallel).
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: report latest metric summary to user after ground-truth stability rerun.
-- Next: optional larger-window/full-file confirmation runs.
+- Now: summarize refreshed sequential final-run metrics and explain the final-code changes.
+- Next: if needed, run a controlled sequential baseline+final suite under lower system load to reduce timing variance.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -40,9 +41,11 @@ Done:
 - Reran ground truth (`baseline-v2-clip180-create-gt-rerun`) on user request.
 - Verified `perf/ground_truth_mono.txt` is unchanged by hash:
   - old/new SHA-256: `c884ae4d490915b3d5bd6cfc61d1cb37485d58df1b4cd92404ec2fbb95348e5f`
+- Deleted `perf/audio_runs/baseline-v1-clip180-create-gt` on user request.
+- Reran `final-ea25661-clip180` and `final-ea25661-clip180-r2` sequentially.
 
 Now:
-- Commit/push rerun artifacts and ledger update.
+- Report sequential rerun results and explain what changed in the final code path.
 
 Next:
 - Optional: run same evaluation with longer clips (e.g., 600s) or full files to confirm scaling.
@@ -65,10 +68,9 @@ Performance results table:
 | Label | Change summary | Commit | Model | Config | Audio | Time (s) | Speedup vs baseline | Deviation vs GT (norm edit / token err) | Notes |
 |---|---|---|---|---|---|---:|---:|---:|---|
 | env-setup-model-fetch | First dependency/model setup only | f4d7d09 | mlx-community/Voxtral-Mini-4B-Realtime-6bit | load-only | n/a | 2057.900 | n/a | n/a | One-time setup, not a transcription benchmark |
-| baseline-v1-clip180-create-gt | Baseline; ground truth generated from mono | f4d7d09 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 66.900 | 0.00% | 0.020814 / 0.031863 | Ground truth saved to `perf/ground_truth_mono.txt` |
-| opt-rfft-v1-clip180 | Experiment: FFT STFT path | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 65.814 | 1.62% | 0.040241 / 0.056373 | Speed gain small; deviation increased |
-| opt-rfft-clearcache2048-clip180 | FFT + clear_cache(2048) | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 50.536 | 24.46% | 0.040241 / 0.056373 | Speed strong, deviation increased |
-| opt-cachebasis-clearcache2048-clip180 | Revert to manual DFT; cache DFT basis + clear_cache(2048) | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 42.601 | 36.32% | 0.020814 / 0.031863 | Best experimental run; deviation back to baseline profile |
-| final-ea25661-clip180 | Committed optimization run #1 | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 51.083 | 23.64% | 0.020814 / 0.031863 | Meets speed target; baseline-equivalent deviation profile |
-| final-ea25661-clip180-r2 | Committed optimization run #2 (repeat) | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 57.770 | 13.65% | 0.020814 / 0.031863 | Repeat still above 10% target |
-| baseline-v2-clip180-create-gt-rerun | Rerun GT generation on request (machine-load check) | 9a08382 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 45.870 | 31.43% | 0.020814 / 0.031863 | `ground_truth_mono.txt` hash unchanged; GT stable |
+| baseline-v2-clip180-create-gt-rerun | Current baseline + GT stability rerun | 9a08382 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 45.870 | 0.00% | 0.020814 / 0.031863 | `ground_truth_mono.txt` hash unchanged; GT stable |
+| opt-rfft-v1-clip180 | Experiment: FFT STFT path | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 65.814 | -43.48% | 0.040241 / 0.056373 | Deviation increased and slower than current baseline |
+| opt-rfft-clearcache2048-clip180 | FFT + clear_cache(2048) | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 50.536 | -10.17% | 0.040241 / 0.056373 | Deviation increased and still slower than current baseline |
+| opt-cachebasis-clearcache2048-clip180 | Revert to manual DFT; cache DFT basis + clear_cache(2048) | f4d7d09 (dirty tree) | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 42.601 | 7.13% | 0.020814 / 0.031863 | Best experimental run with baseline-equivalent deviation |
+| final-ea25661-clip180 | Committed optimization run #1 (sequential rerun) | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 72.014 | -57.00% | 0.020814 / 0.031863 | Accuracy unchanged; timing degraded in this rerun |
+| final-ea25661-clip180-r2 | Committed optimization run #2 (sequential rerun) | ea25661 | local HF snapshot | clip=180s,warmup=10s,temp=0.0 | mono+stereo | 98.176 | -114.03% | 0.020814 / 0.031863 | Accuracy unchanged; substantial slowdown in this rerun |

@@ -2,18 +2,18 @@
   "aggregate": {
     "mean_norm_edit_distance": 0.020814061054579093,
     "mean_token_error_ratio": 0.031862745098039214,
-    "total_elapsed_seconds": 51.08279966691043
+    "total_elapsed_seconds": 72.0135744579602
   },
   "clip_seconds": 180,
   "commit": "ea25661",
   "created_ground_truth": false,
-  "generated_at_utc": "2026-02-09T09:09:33.113612+00:00",
+  "generated_at_utc": "2026-02-09T09:22:47.291380+00:00",
   "label": "final-ea25661-clip180",
   "model_path": "/Users/artus/.cache/huggingface/hub/models--mlx-community--Voxtral-Mini-4B-Realtime-6bit/snapshots/02eb0caeb9dafb554c17a72b93dbf40cd3736c31",
   "runs": [
     {
       "clip_seconds": 180,
-      "elapsed_seconds": 26.400074791978113,
+      "elapsed_seconds": 33.38506316696294,
       "name": "mono",
       "norm_edit_distance": 0.0,
       "source_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k.wav",
@@ -23,7 +23,7 @@
     },
     {
       "clip_seconds": 180,
-      "elapsed_seconds": 24.68272487493232,
+      "elapsed_seconds": 38.62851129099727,
       "name": "stereo",
       "norm_edit_distance": 0.041628122109158186,
       "source_path": "../vllm/voxtral_test_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k.wav",
