@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: completed 3x sequential timing runs for incoming implementations using the updated correctness-branch reference transcript as GT.
-- Next: decide which incoming implementation to promote based on timing stability and then continue decode/text-quality alignment work.
+- Now: completed DFT-vs-FFT comparison runs for all incoming implementations (3x each).
+- Next: decide backend policy (`dft` preferred for speed/stability in these runs) and investigate why FFT changed stereo quality metrics.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -151,6 +151,23 @@ Done:
   - Quality metrics against new reference GT (all three versions/runs unchanged):
     - `mean_norm_edit_distance=0.872752`
     - `mean_token_error_ratio=0.890049`
+- 2026-02-09: Ran equivalent sequential campaign with `VOXMLX_STFT_BACKEND=fft` forced:
+  - Command:
+    - `VOXMLX_STFT_BACKEND=fft PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix /tmp/voxmlx_matrix_incoming_r3.json --campaign incoming-only-clip600-r3-correctnessgt-fft --repeats 3 --python /Users/crabbotix/gitrepos/voxmlx/.venv313/bin/python --version-ids incoming_59735f8,incoming_cce41e1,incoming_dc994b1 --skip-ground-truth-refresh`
+  - Output:
+    - `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r3-correctnessgt-fft/summary.json`
+    - `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r3-correctnessgt-fft/runs.csv`
+  - Timing means (total mono+stereo elapsed):
+    - `incoming_59735f8`: `324.734s` (stdev `0.857s`)
+    - `incoming_cce41e1`: `309.128s` (stdev `10.901s`)
+    - `incoming_dc994b1`: `313.851s` (stdev `13.027s`)
+  - DFT vs FFT timing deltas (FFT minus DFT mean):
+    - `incoming_59735f8`: `+9.583s` (`+3.041%` slower)
+    - `incoming_cce41e1`: `+4.076s` (`+1.336%` slower)
+    - `incoming_dc994b1`: `+9.114s` (`+2.991%` slower)
+  - Quality metrics shifted under FFT (consistent across versions/runs):
+    - DFT campaign: `mean_norm_edit_distance=0.872752`, `mean_token_error_ratio=0.890049`
+    - FFT campaign: `mean_norm_edit_distance=0.617191`, `mean_token_error_ratio=0.696253`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
@@ -171,10 +188,10 @@ Done:
 - Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
 
 Now:
-- Share 3x timing table for incoming implementations and highlight fastest/most stable variants.
+- Share DFT-vs-FFT timing and metric deltas for the same incoming implementations.
 
 Next:
-- Choose promotion candidate (`dc994b1` fastest mean vs `cce41e1` lower variance) and proceed with decode/text-quality remediation.
+- Continue with `dft` for benchmark speed runs and perform targeted inspection of FFT-induced stereo text differences.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -196,6 +213,7 @@ Working set (files/ids/commands):
 - `origin/codex/correctness-performance-scaffold:perf/ground_truth_mono.txt`
 - `/tmp/voxmlx_matrix_incoming_r3.json`
 - `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r3-correctnessgt/*`
+- `/Users/crabbotix/gitrepos/voxmlx/perf/batch_runs/incoming-only-clip600-r3-correctnessgt-fft/*`
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
 
