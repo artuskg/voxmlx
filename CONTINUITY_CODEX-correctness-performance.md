@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: resumed continuity ledger for current session and continue Mac Mini batch workflow handoff (version matrix + sequential runner + docs).
-- Next: run the matrix on Mac Mini for 10x repeats per version and review aggregate stats.
+- Now: local handoff branch created for ledger continuity updates; upstream push is blocked by repository permission on this machine.
+- Next: obtain writable remote access (or alternate remote) and push `codex/continuity-ledger-sync`; keep tracking `codex/correctness-performance-scaffold` for incoming changes.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -37,6 +37,12 @@ Done:
   - Missing matrix-referenced local assets:
     - model snapshot under `~/.cache/huggingface/hub/.../02eb0caeb9dafb554c17a72b93dbf40cd3736c31`
     - audio fixtures under `../vllm/voxtral_test_audio/`
+- 2026-02-09: Created local branch `codex/continuity-ledger-sync` and committed continuity updates (`dbfe8a9`).
+- 2026-02-09: Push attempts failed on this machine:
+  - `git push -u origin codex/continuity-ledger-sync` -> HTTP 403 (`Permission to artuskg/voxmlx.git denied to Crabbotix`)
+  - SSH fallback also failed (`Host key verification failed`)
+- 2026-02-09: Monitoring snapshot for source branch after `git fetch --all --prune`:
+  - `codex/correctness-performance-scaffold` is in sync with `origin/codex/correctness-performance-scaffold` (ahead/behind: `0/0`)
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
