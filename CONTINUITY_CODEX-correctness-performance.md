@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: incoming-only validation completed (new scaffold refs only) with preserved historical run artifacts/ledger metrics.
-- Next: decide whether to accept any incoming commit for promotion and whether to run repeats>1 for variance confirmation.
+- Now: identified root cause for short transcripts and muted perceived speedups: decode loops generate long runs of `[STREAMING_PAD]` tokens after initial text, so elapsed time keeps rising while visible text barely grows.
+- Next: add decode diagnostics/termination policy for repeated streaming-pad output and switch quality evaluation to human/reference transcripts (not model-derived GT).
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -98,6 +98,13 @@ Done:
     - `incoming_59735f8`: `-2.727%`
     - `incoming_cce41e1`: `-2.078%`
     - `incoming_dc994b1`: `-1.880%`
+- 2026-02-09: Investigated transcript-length anomaly:
+  - `mono_transcript.txt` for 180s and 600s campaigns is identical (`204` words, `1081` chars; same SHA-256 `c884ae4d...`).
+  - Generated token count still scales with clip length (`2260` @ 180s, `7509` @ 600s), indicating decode continues for full clip budget.
+  - 60s diagnostic decode:
+    - `token_count=760`, decoded with `SpecialTokenPolicy.IGNORE`: `159` words / `856` chars.
+    - decoded with `KEEP`: `9522` chars with large `[STREAMING_PAD]` runs near tail.
+  - Conclusion: current metric pipeline hides this failure mode because ground truth is model-derived and equals the same truncated/hallucinated text.
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
