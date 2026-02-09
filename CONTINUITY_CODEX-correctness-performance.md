@@ -197,6 +197,13 @@ Done:
     - `scripts/run_incremental_10s_matrix.py`
     - `perf/incremental_10s_matrix.json`
   - Current docs in fetched branches still reference `scripts/run_version_matrix.py` + `perf/version_matrix.json`, not the incremental-10s files.
+- 2026-02-09: Re-verified after explicit check of `origin/codex/consolidated-post-e6d193e` (`5dd3c9f`) and all fetched refs (including `origin/pull/1/head`):
+  - Branch is visible and up to date locally.
+  - Requested files are still absent from all reachable refs:
+    - `scripts/incremental_file_eval.py`
+    - `scripts/run_incremental_10s_matrix.py`
+    - `perf/incremental_10s_matrix.json`
+  - No executable fallback with those exact commands is possible until commit/ref with those files is available in this clone.
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
