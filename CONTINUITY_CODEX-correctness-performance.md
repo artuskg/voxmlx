@@ -168,6 +168,19 @@ Done:
   - Quality metrics shifted under FFT (consistent across versions/runs):
     - DFT campaign: `mean_norm_edit_distance=0.872752`, `mean_token_error_ratio=0.890049`
     - FFT campaign: `mean_norm_edit_distance=0.617191`, `mean_token_error_ratio=0.696253`
+- 2026-02-09: Confirmed why FFT metrics shifted:
+  - For sampled comparison (`incoming_dc994b1`, run 2), mono transcript is unchanged between backends:
+    - DFT mono hash = FFT mono hash = `c884ae4d...` (`1081` chars)
+  - Stereo transcript diverges strongly under FFT:
+    - DFT stereo: `1081` chars (`sha256=13e3ad01...`)
+    - FFT stereo: `6615` chars (`sha256=785999f5...`)
+  - Interpretation: FFT metric change in this campaign is driven by stereo-output behavior change against a mono-derived GT, not by mono transcript correction.
+- 2026-02-09: Pushed benchmark result artifacts for reproducibility:
+  - `perf/batch_runs/incoming-only-clip600-r3-correctnessgt/summary.json`
+  - `perf/batch_runs/incoming-only-clip600-r3-correctnessgt/runs.csv`
+  - `perf/batch_runs/incoming-only-clip600-r3-correctnessgt-fft/summary.json`
+  - `perf/batch_runs/incoming-only-clip600-r3-correctnessgt-fft/runs.csv`
+  - `perf/batch_runs/incoming-only-clip600-r3-backend-comparison.md`
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
