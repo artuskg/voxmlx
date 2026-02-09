@@ -43,6 +43,28 @@ class MlxRuntimeOptionalTests(unittest.TestCase):
             self.assertLessEqual(k.shape[2], 8)
             self.assertLessEqual(v.shape[2], 8)
 
+    def test_rotating_kv_cache_concat_keeps_expected_tail_for_multi_token_append(self):
+        import mlx.core as mx
+        import numpy as np
+
+        from voxmlx.cache import RotatingKVCache
+
+        cache = RotatingKVCache(max_size=8)
+
+        base = mx.arange(8, dtype=mx.float32).reshape(1, 1, 8, 1)
+        cache.update_and_fetch(base, base)
+
+        add = mx.array([100, 101, 102, 103], dtype=mx.float32).reshape(1, 1, 4, 1)
+        k, v = cache.update_and_fetch(add, add)
+
+        expected = mx.array([4, 5, 6, 7, 100, 101, 102, 103], dtype=mx.float32).reshape(
+            1, 1, 8, 1
+        )
+        self.assertEqual(k.shape[2], 8)
+        self.assertEqual(v.shape[2], 8)
+        np.testing.assert_allclose(np.array(k), np.array(expected), atol=0.0, rtol=0.0)
+        np.testing.assert_allclose(np.array(v), np.array(expected), atol=0.0, rtol=0.0)
+
     def test_offline_and_streaming_mel_match(self):
         import mlx.core as mx
         import numpy as np
@@ -198,6 +220,85 @@ class MlxRuntimeOptionalTests(unittest.TestCase):
         self.assertTrue(
             np.allclose(np.array(offline), np.array(incremental), atol=1e-4, rtol=1e-4)
         )
+
+    def test_encode_step_uses_encoder_sliding_window_for_cache_size(self):
+        import mlx.core as mx
+
+        from voxmlx.model import VoxtralRealtime
+
+        sliding_window = 7
+        config = {
+            "dim": 16,
+            "ada_rms_norm_t_cond_dim": 16,
+            "n_layers": 1,
+            "n_heads": 2,
+            "n_kv_heads": 1,
+            "head_dim": 8,
+            "hidden_dim": 32,
+            "vocab_size": 256,
+            "rope_theta": 1e6,
+            "multimodal": {
+                "whisper_model_args": {
+                    "encoder_args": {
+                        "audio_encoding_args": {"num_mel_bins": 128},
+                        "dim": 16,
+                        "n_layers": 2,
+                        "n_heads": 2,
+                        "head_dim": 8,
+                        "hidden_dim": 32,
+                        "rope_theta": 1e6,
+                        "sliding_window": sliding_window,
+                    },
+                    "downsample_args": {"downsample_factor": 4},
+                }
+            },
+        }
+        model = VoxtralRealtime(config)
+
+        mel_chunk = mx.zeros((128, 16), dtype=mx.float32)
+        _, _, _, encoder_cache, _ = model.encode_step(
+            mel_chunk,
+            conv1_tail=None,
+            conv2_tail=None,
+            encoder_cache=None,
+            ds_buf=None,
+        )
+
+        self.assertIsNotNone(encoder_cache)
+        self.assertEqual(len(encoder_cache), 2)
+        for layer_cache in encoder_cache:
+            self.assertEqual(layer_cache.max_size, sliding_window)
+
+    def test_encode_trims_trailing_frames_not_leading_frames(self):
+        import mlx.core as mx
+        import numpy as np
+
+        from voxmlx.model import VoxtralRealtime
+
+        class _FakeEncoder:
+            def __call__(self, mel):
+                # Return one channel that directly tracks encoded frame index.
+                length = int(mel.shape[1])
+                return mx.arange(length, dtype=mx.float32).reshape(1, length, 1)
+
+        class _FakeAdapter:
+            def __call__(self, x):
+                return x
+
+        class _FakeModel:
+            def __init__(self):
+                self.encoder = _FakeEncoder()
+                self.adapter = _FakeAdapter()
+                self.downsample_factor = 3
+
+        fake = _FakeModel()
+
+        # Odd mel length triggers the first trim path. Then downsample remainder
+        # triggers the second trim path. Correct behavior keeps earliest indices.
+        mel = mx.zeros((128, 9), dtype=mx.float32)
+        out = VoxtralRealtime.encode(fake, mel)
+        expected = np.array([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]], dtype=np.float32)
+        np.testing.assert_allclose(np.array(out), expected, atol=0.0, rtol=0.0)
 
 
 if __name__ == "__main__":
