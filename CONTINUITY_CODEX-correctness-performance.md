@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: investigate new regression report: after a few hundred output tokens, generation appears to switch to mostly non-text/special tokens.
-- Next: isolate root cause with targeted toggles (STFT backend, temperature, model/prompt constants, streaming-vs-offline parity traces).
+- Now: clarify/diagnose encoder cached-causal-mask sensitivity (user asked for deeper explanation).
+- Next: if needed, add explicit mask contract tests tied to current MLX behavior.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -93,6 +93,7 @@ Done:
   - High-confidence candidate: default STFT backend now prefers FFT when available (`voxmlx/audio.py`), but prior experiments showed the FFT path materially worsened transcript deviation versus DFT.
   - Candidate: prompt contract constants (`n_left_pad_tokens`, `n_delay_tokens`) remain hardcoded defaults; model-variant mismatch could push decoder into special-token-heavy regime mid-sequence.
   - Candidate: encoder streaming attention semantics rely on MLX causal-mask behavior for `q_len != k_len`; currently covered by equivalence tests but still version-fragile.
+  - Observed local runtime: `mlx.core` version `0.30.6`.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
