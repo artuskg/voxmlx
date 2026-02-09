@@ -63,3 +63,4 @@ At the beginning of a new session, before starting the actual work, offer the us
 ## Confusion log
 
 - 2026-02-09: Initial local policy file created for voxmlx to make project workflow explicit and compaction-safe.
+- 2026-02-09: Creating a new branch and committing succeeded, but push to `origin` failed with `403 (Permission to artuskg/voxmlx.git denied to Crabbotix)`; SSH fallback failed with host-key verification. Resolution: keep local branch/commits ready and report exact blocked push command for user-side credential/remote fix.
