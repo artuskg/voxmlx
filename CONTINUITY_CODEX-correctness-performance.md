@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: running cross-checks with `../voxtral.c` on the same reference audio to compare emitted text/token behavior against `voxmlx`.
-- Next: capture `voxtral.c` mono/stereo outputs (tokens, steps, chars/words, snippets) and contrast with current `voxmlx` transcripts to isolate tokenizer/decoder-vs-runtime issues.
+- Now: comparing newly-updated correctness-branch reference transcript against captured `voxtral.c` output.
+- Next: use this external reference comparison to tune `voxmlx` decode/text filtering behavior and benchmarking quality gates.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -119,6 +119,18 @@ Done:
   - Compared with `voxmlx` incoming run `incoming_dc994b1`:
     - `voxmlx` per-audio elapsed ~`161-162s`, token count `7509`, transcript `1081` chars (~`204` words).
     - `voxtral.c` transcript is ~`7.8x` longer in chars (`8461/1081`), while running ~`5.6x` slower per 600s audio file.
+- 2026-02-09: Pulled latest correctness branch state (`origin/codex/correctness-performance-scaffold` at `a4f3ac6`) and compared new reference transcript against `voxtral.c` mono output:
+  - Reference files changed at tip commit:
+    - `perf/ground_truth_mono.txt`
+    - `perf/ground_truth_mono.pre_incremental_10min.txt`
+  - Comparison artifact:
+    - `/Users/crabbotix/gitrepos/voxmlx/perf/voxtralc_compare/20260209_145139/compare_reference_gt_vs_voxtralc.md`
+  - New `ground_truth_mono.txt` vs `voxtral.c` (`mono_stdout.txt`):
+    - `8452` vs `8461` chars, `1628` vs `1633` words
+    - Levenshtein distance `81` (`~0.96%` normalized over max length), sequence ratio `0.9569`
+  - After lowercasing + punctuation stripping + whitespace normalization, remaining distance is very small:
+    - Levenshtein `11` over ~`8.2k` chars (`~0.13%` normalized), indicating near-match with mostly formatting/tokenization differences.
+  - Prior pre-incremental GT remains far from `voxtral.c` output (`1081` chars vs `8461`; distance `7389`).
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
@@ -139,10 +151,10 @@ Done:
 - Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
 
 Now:
-- Synthesize root-cause hypotheses from cross-implementation delta (`voxmlx` short transcripts vs `voxtral.c` longer text with similar decode-step counts).
+- Integrate new external reference transcript (correctness branch) as the quality anchor for `voxmlx` comparisons.
 
 Next:
-- Validate decoder special-token handling / termination behavior against `voxtral.c` semantics and add targeted diagnostics on text-token filtering.
+- Add/adjust correctness checks so long-form transcript evaluation is measured against reference text, not model-derived GT.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -161,6 +173,7 @@ Working set (files/ids/commands):
 - `/Users/crabbotix/gitrepos/voxtral.c/voxtral`
 - `/Volumes/BigStore/voxtral-model/*`
 - `/Users/crabbotix/gitrepos/voxmlx/perf/voxtralc_compare/20260209_145139/*`
+- `origin/codex/correctness-performance-scaffold:perf/ground_truth_mono.txt`
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
 
