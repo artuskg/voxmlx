@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: Opus hypothesis checks completed; integrating conclusions into next debugging step.
-- Next: prioritize encoder path equivalence fixes (offline vs incremental encode math/order), then re-run focused tracer expecting first divergence to move rightward.
+- Now: 20-second stage-localization and decode-from-embeds sanity checks completed to narrow the first mismatch source.
+- Next: attempt minimal fix in encoder transformer equivalence path, then re-run 20s/120s focused tracer gates.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -220,6 +220,23 @@ Done:
       - incremental `[STREAMING_PAD]` ratio `0.581`, longest special run `39`
       - artifact: `perf/audio_runs/opus-checks-20260209-keep/keep_token_behavior_120s.json`
     - conclusion: collapse manifests as PAD-heavy behavior in non-incremental path, consistent with earlier divergence evidence.
+- Additional stage-localization and isolation checks (2026-02-09):
+  - 20s stage-localization (with conv1 included):
+    - artifact: `perf/audio_runs/opus-checks-20260209-stage/stage_localization_20s.json`
+    - mel parity remains exact-scale (`max_abs_global ~ 6.15e-05`)
+    - `conv1` first exceeds `1e-2`: `None` (max abs `0.00390625`)
+    - `conv2` first exceeds `1e-2`: position `134`
+    - `encoder_transformer_out` first exceeds `1e-2`: position `0`
+    - `adapter_embeds` first exceeds `1e-2`: position `2`, first >`1.0` at `48`
+    - conclusion: earliest substantial divergence begins in transformer stage, not conv.
+  - 120s stage-localization artifact persisted:
+    - `perf/audio_runs/opus-checks-20260209-stage/stage_localization_120s.json`
+  - Decode-from-embeds isolation check (20s):
+    - artifact: `perf/audio_runs/opus-checks-20260209-stage/decode_from_embeds_20s.json`
+    - `generate_nonincremental` == `decode_from_nonincremental_embeds` (exact)
+    - `generate_nonincremental` != `decode_from_incremental_embeds`
+    - first divergence vs incremental-embeds decode: token `50`
+    - conclusion: decoder logic itself is consistent; divergence is driven by encoder embedding differences.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -250,6 +267,7 @@ Next:
 - Investigate encoder cached attention alignment (`mask="causal"` with `q_len != k_len`) as primary suspect for contract failure.
 - Use focused tracer around first divergence while testing encoder-alignment fixes; success criterion is stable argmax agreement at/after index 50 on the 120s diagnostic run.
 - Focus immediate debugging on why offline `encode()` and incremental `encode_step()` diverge numerically so early (operation ordering / masking path), since async and EOS-collapse hypotheses were falsified.
+- Target immediate fix attempt on encoder transformer equivalence (`forward_transformer` full-seq vs chunked-cache path), since conv mismatch appears later than the first token divergence trigger.
 - Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
 - Rebaseline existing perf run deviation metrics against updated ground truth.
 - Optionally regenerate with identical timing conditions on a quieter machine for cleaner speed comparison.
@@ -292,6 +310,9 @@ Working set (files/ids/commands):
 - `perf/audio_runs/opus-checks-20260209-async/async_eval_check_120s_vs_incremental.json`
 - `perf/audio_runs/opus-checks-20260209-encoder/encoder_drift_120s.json`
 - `perf/audio_runs/opus-checks-20260209-keep/keep_token_behavior_120s.json`
+- `perf/audio_runs/opus-checks-20260209-stage/stage_localization_20s.json`
+- `perf/audio_runs/opus-checks-20260209-stage/stage_localization_120s.json`
+- `perf/audio_runs/opus-checks-20260209-stage/decode_from_embeds_20s.json`
 - `perf/ground_truth_mono.txt`
 - `perf/audio_runs/*/metrics.json`
 - `perf/audio_runs/*/*_transcript.txt`
