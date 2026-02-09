@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: identified root cause for short transcripts and muted perceived speedups: decode loops generate long runs of `[STREAMING_PAD]` tokens after initial text, so elapsed time keeps rising while visible text barely grows.
-- Next: add decode diagnostics/termination policy for repeated streaming-pad output and switch quality evaluation to human/reference transcripts (not model-derived GT).
+- Now: running cross-checks with `../voxtral.c` on the same reference audio to compare emitted text/token behavior against `voxmlx`.
+- Next: capture `voxtral.c` mono/stereo outputs (tokens, steps, chars/words, snippets) and contrast with current `voxmlx` transcripts to isolate tokenizer/decoder-vs-runtime issues.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -105,6 +105,20 @@ Done:
     - `token_count=760`, decoded with `SpecialTokenPolicy.IGNORE`: `159` words / `856` chars.
     - decoded with `KEEP`: `9522` chars with large `[STREAMING_PAD]` runs near tail.
   - Conclusion: current metric pipeline hides this failure mode because ground truth is model-derived and equals the same truncated/hallucinated text.
+- 2026-02-09: Downloaded `voxtral.c`-compatible model to BigStore and verified:
+  - `/Volumes/BigStore/voxtral-model/consolidated.safetensors`
+  - `/Volumes/BigStore/voxtral-model/params.json`
+  - `/Volumes/BigStore/voxtral-model/tekken.json`
+- 2026-02-09: Confirmed `../voxtral.c` binary is present and executable:
+  - `/Users/crabbotix/gitrepos/voxtral.c/voxtral`
+- 2026-02-09: Ran `voxtral.c` sequentially on 10-minute mono/stereo reference WAVs with BigStore weights:
+  - Output dir: `/Users/crabbotix/gitrepos/voxmlx/perf/voxtralc_compare/20260209_145139`
+  - `mono`: `real=906.65s`; encoder `7549` tokens; decoder `1958` text tokens over `7511` steps (`110.3 ms/step`); transcript `8461` chars / `1633` words.
+  - `stereo`: `real=900.33s`; encoder `7549` tokens; decoder `1958` text tokens over `7511` steps (`111.1 ms/step`); transcript `8461` chars / `1633` words.
+  - Mono/stereo `voxtral.c` outputs are byte-identical (`sha256=29037984...`).
+  - Compared with `voxmlx` incoming run `incoming_dc994b1`:
+    - `voxmlx` per-audio elapsed ~`161-162s`, token count `7509`, transcript `1081` chars (~`204` words).
+    - `voxtral.c` transcript is ~`7.8x` longer in chars (`8461/1081`), while running ~`5.6x` slower per 600s audio file.
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
@@ -125,12 +139,10 @@ Done:
 - Updated project-local `AGENTS.md` with sequential benchmark requirement and matrix-runner policy.
 
 Now:
-- Preparing git handoff: push current continuity updates to a new `codex/*` branch, then keep watching the original scaffold branch for incoming updates.
+- Synthesize root-cause hypotheses from cross-implementation delta (`voxmlx` short transcripts vs `voxtral.c` longer text with similar decode-step counts).
 
 Next:
-- Execute on Mac Mini:
-  - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --campaign <campaign-name>`
-- Compare `perf/batch_runs/<campaign>/summary.json` means/stdevs and decide next optimization targets.
+- Validate decoder special-token handling / termination behavior against `voxtral.c` semantics and add targeted diagnostics on text-token filtering.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -146,6 +158,9 @@ Working set (files/ids/commands):
 - `scripts/run_version_matrix.py`
 - `perf/version_matrix.json`
 - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --dry-run`
+- `/Users/crabbotix/gitrepos/voxtral.c/voxtral`
+- `/Volumes/BigStore/voxtral-model/*`
+- `/Users/crabbotix/gitrepos/voxmlx/perf/voxtralc_compare/20260209_145139/*`
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
 
