@@ -23,6 +23,9 @@
   - `python3 scripts/bench_contracts.py --iterations 20000 --output perf/current_contracts.json`
 - Perf regression check:
   - `python3 scripts/check_perf_regression.py --baseline perf/baseline_contracts.json --current perf/current_contracts.json --threshold 0.20 --warn-only`
+- Audio correctness/performance eval (segment-based, reproducible):
+  - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label baseline-v1-clip180-create-gt --commit $(git rev-parse --short HEAD) --clip-seconds 180 --create-ground-truth`
+  - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label <label> --commit $(git rev-parse --short HEAD) --clip-seconds 180 --ground-truth-path perf/ground_truth_mono.txt`
 
 ### Optional model-backed differential tests
 

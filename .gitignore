@@ -206,6 +206,7 @@ cython_debug/
 
 # Local perf outputs
 perf/current_contracts.json
+perf/audio_runs/**/*.wav
 
 # Marimo
 marimo/_static/

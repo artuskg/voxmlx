@@ -68,7 +68,7 @@ def generate(
             break
         output_tokens.append(token_id)
 
-        if pos % 256 == 0:
+        if pos % 2048 == 0:
             mx.clear_cache()
 
         y = next_y

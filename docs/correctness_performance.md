@@ -5,6 +5,7 @@ This repository now uses two lanes:
 1. Correctness lane (required)
 2. Performance lane (tracked, warn-only by default)
 3. Optional model-backed differential lane (off by default)
+4. Audio eval lane for mono-ground-truth + speed tracking
 
 ## Correctness Lane
 
@@ -68,3 +69,25 @@ GitHub Actions workflow `.github/workflows/correctness-performance.yml`:
 - Runs microbenchmarks and checks regressions in warn-only mode.
 - Uploads benchmark JSON as an artifact for trend tracking.
 - Does not run model-backed differential tests by default.
+
+## Audio Eval Lane
+
+For real-audio perf/quality runs against the two Voxtral test audio files, use:
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py \
+  --label baseline-v1-clip180-create-gt \
+  --commit $(git rev-parse --short HEAD) \
+  --clip-seconds 180 \
+  --create-ground-truth
+```
+
+Then run comparison labels using the saved ground truth:
+
+```bash
+PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py \
+  --label <label> \
+  --commit $(git rev-parse --short HEAD) \
+  --clip-seconds 180 \
+  --ground-truth-path perf/ground_truth_mono.txt
+```
