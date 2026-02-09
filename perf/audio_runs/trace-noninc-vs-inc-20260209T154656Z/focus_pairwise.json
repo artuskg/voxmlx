@@ -1,0 +1,145 @@
+[
+  {
+    "output_index": 48,
+    "token_non_incremental": 32,
+    "token_incremental": 32,
+    "token_equal": true,
+    "token_non_incremental_text_keep": "[STREAMING_PAD]",
+    "token_incremental_text_keep": "[STREAMING_PAD]",
+    "producer_source_non_incremental": "step",
+    "producer_source_incremental": "step",
+    "producer_audio_pos_non_incremental": 86,
+    "producer_audio_pos_incremental": 86,
+    "producer_input_token_non_incremental": 32,
+    "producer_input_token_incremental": 32,
+    "producer_argmax_non_incremental": 32,
+    "producer_argmax_incremental": 32,
+    "producer_topk_overlap_count": 8,
+    "producer_topk_overlap_ids": [
+      2,
+      32,
+      33,
+      1044,
+      1046,
+      1261,
+      1362,
+      2880
+    ],
+    "audio_embed_diff": {
+      "l2_norm_diff": 1.5448400974273682,
+      "mean_abs_diff": 0.020302025601267815,
+      "max_abs_diff": 0.25
+    }
+  },
+  {
+    "output_index": 49,
+    "token_non_incremental": 32,
+    "token_incremental": 32,
+    "token_equal": true,
+    "token_non_incremental_text_keep": "[STREAMING_PAD]",
+    "token_incremental_text_keep": "[STREAMING_PAD]",
+    "producer_source_non_incremental": "step",
+    "producer_source_incremental": "step",
+    "producer_audio_pos_non_incremental": 87,
+    "producer_audio_pos_incremental": 87,
+    "producer_input_token_non_incremental": 32,
+    "producer_input_token_incremental": 32,
+    "producer_argmax_non_incremental": 32,
+    "producer_argmax_incremental": 32,
+    "producer_topk_overlap_count": 7,
+    "producer_topk_overlap_ids": [
+      2,
+      32,
+      33,
+      1044,
+      1046,
+      1261,
+      1362
+    ],
+    "audio_embed_diff": {
+      "l2_norm_diff": 1.0753462314605713,
+      "mean_abs_diff": 0.01442017126828432,
+      "max_abs_diff": 0.22579193115234375
+    }
+  },
+  {
+    "output_index": 50,
+    "token_non_incremental": 32,
+    "token_incremental": 33,
+    "token_equal": false,
+    "token_non_incremental_text_keep": "[STREAMING_PAD]",
+    "token_incremental_text_keep": "[STREAMING_WORD]",
+    "producer_source_non_incremental": "step",
+    "producer_source_incremental": "step",
+    "producer_audio_pos_non_incremental": 88,
+    "producer_audio_pos_incremental": 88,
+    "producer_input_token_non_incremental": 32,
+    "producer_input_token_incremental": 32,
+    "producer_argmax_non_incremental": 32,
+    "producer_argmax_incremental": 33,
+    "producer_topk_overlap_count": 5,
+    "producer_topk_overlap_ids": [
+      2,
+      32,
+      33,
+      1044,
+      1046
+    ],
+    "audio_embed_diff": {
+      "l2_norm_diff": 1.0792114734649658,
+      "mean_abs_diff": 0.014978121034801006,
+      "max_abs_diff": 0.1241455078125
+    }
+  },
+  {
+    "output_index": 51,
+    "token_non_incremental": 33,
+    "token_incremental": 4493,
+    "token_equal": false,
+    "token_non_incremental_text_keep": "[STREAMING_WORD]",
+    "token_incremental_text_keep": " So",
+    "producer_source_non_incremental": "step",
+    "producer_source_incremental": "step",
+    "producer_audio_pos_non_incremental": 89,
+    "producer_audio_pos_incremental": 89,
+    "producer_input_token_non_incremental": 32,
+    "producer_input_token_incremental": 33,
+    "producer_argmax_non_incremental": 33,
+    "producer_argmax_incremental": 4493,
+    "producer_topk_overlap_count": 2,
+    "producer_topk_overlap_ids": [
+      32,
+      4493
+    ],
+    "audio_embed_diff": {
+      "l2_norm_diff": 0.5980201363563538,
+      "mean_abs_diff": 0.008251368068158627,
+      "max_abs_diff": 0.125
+    }
+  },
+  {
+    "output_index": 52,
+    "token_non_incremental": 4493,
+    "token_incremental": 32,
+    "token_equal": false,
+    "token_non_incremental_text_keep": " So",
+    "token_incremental_text_keep": "[STREAMING_PAD]",
+    "producer_source_non_incremental": "step",
+    "producer_source_incremental": "step",
+    "producer_audio_pos_non_incremental": 90,
+    "producer_audio_pos_incremental": 90,
+    "producer_input_token_non_incremental": 33,
+    "producer_input_token_incremental": 4493,
+    "producer_argmax_non_incremental": 4493,
+    "producer_argmax_incremental": 32,
+    "producer_topk_overlap_count": 1,
+    "producer_topk_overlap_ids": [
+      32
+    ],
+    "audio_embed_diff": {
+      "l2_norm_diff": 0.5842584371566772,
+      "mean_abs_diff": 0.007994570769369602,
+      "max_abs_diff": 0.125
+    }
+  }
+]

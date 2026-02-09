@@ -1,4 +1,5 @@
 import mlx.core as mx
+import numpy as np
 
 from .audio import load_audio, log_mel_spectrogram, pad_audio
 from .cache import RotatingKVCache
@@ -14,11 +15,12 @@ def generate(
     temperature: float = 0.0,
     eos_token_id: int = 2,
     sliding_window: int | None = None,
+    audio_override: np.ndarray | None = None,
 ) -> list[int]:
     if sliding_window is None:
         sliding_window = DEFAULT_DECODER_SLIDING_WINDOW
     # 1. Load audio, pad for streaming, and compute mel spectrogram
-    audio = load_audio(audio_path)
+    audio = audio_override if audio_override is not None else load_audio(audio_path)
     audio = pad_audio(audio)
     mel = log_mel_spectrogram(audio)  # [n_mels, T]
 

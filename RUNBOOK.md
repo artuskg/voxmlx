@@ -26,6 +26,11 @@
 - Audio correctness/performance eval (segment-based, reproducible):
   - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label baseline-v1-clip600-create-gt --commit $(git rev-parse --short HEAD) --mono-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --stereo-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav --clip-seconds 600 --create-ground-truth`
   - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label <label> --commit $(git rev-parse --short HEAD) --mono-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --stereo-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_stereo_16k_10min.wav --clip-seconds 600 --ground-truth-path perf/ground_truth_mono.txt`
+- Non-incremental vs incremental divergence trace (debug, low-overhead token tracing):
+  - `VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python scripts/trace_nonincremental_vs_incremental.py --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --clip-seconds 120`
+  - Focused step-through around first divergence token:
+    - `VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python scripts/trace_nonincremental_vs_incremental.py --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --clip-seconds 120 --focus-token-index 50 --focus-window 2 --trace-topk 8`
+  - Note: keep `--clip-seconds <= 120` for non-incremental path diagnostics.
 
 ### Optional model-backed differential tests
 

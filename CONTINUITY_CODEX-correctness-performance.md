@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: FFT incremental 10-minute transcript generated and stored in separate run directory for direct comparison.
-- Next: compute richer diff metrics between DFT and FFT transcripts if needed.
+- Now: focused token-level step-through at divergence index (`50`) implemented and exercised.
+- Next: use focused trace to validate encoder-path fixes (expect argmax agreement and first meaningful divergence to move rightward or disappear).
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -119,6 +119,74 @@ Done:
   - config: `method=incremental_file_pipeline`, `stft_backend=fft`
   - elapsed: `614.701s`, tokens=`7510`, chars=`8454`
   - word count parity with DFT transcript: both `1628` words.
+- Local self-adjudicated comparison output (DFT vs FFT transcripts):
+  - artifact dir: `perf/audio_runs/semantic-compare-dft-vs-fft-20260209T143909Z/`
+  - metrics: `char_levenshtein=14` (`0.001656` normalized), `token_levenshtein=14` (`0.008600` normalized), `non_equal_ops=7`
+  - diff characterization: all 7 ops are punctuation/casing boundary changes (e.g., `attic and` -> `attic. And`, `Okay. So` -> `Okay, so`), no content-word substitutions observed.
+- Confirmed timing comparison from run summaries:
+  - DFT incremental 10-min elapsed: `374.227s`
+  - FFT incremental 10-min elapsed: `614.701s`
+  - FFT vs DFT on this machine/run: `+240.474s` (~`64.3%` slower).
+- Added debug instrumentation workflow:
+  - new script: `scripts/trace_nonincremental_vs_incremental.py`
+  - compares non-incremental (`generate`) vs incremental-encoder decode on the same clipped audio
+  - preserves special tokens explicitly (`SpecialTokenPolicy.KEEP`)
+  - labels mismatch spans as meaningful unless difference is only whitespace / `.` / `,` / capitalization
+  - writes token IDs, decoded outputs, span diffs, first divergence indices, and runtime stats to `perf/audio_runs/trace-noninc-vs-inc-<timestamp>/`
+- Extended tracer with focused step-through mode:
+  - args: `--focus-token-index`, `--focus-window`, `--trace-topk`
+  - emits:
+    - `non_incremental_focus_trace.json`
+    - `incremental_focus_trace.json`
+    - `focus_pairwise.json`
+  - per focus token, captures:
+    - emitted token/id/text and special-token flag
+    - producer source (`prefill` or `step`)
+    - producer audio position and input token
+    - producer logits top-k
+    - producer audio/step embed stats
+    - pairwise audio-embedding diff stats across non-incremental vs incremental
+- Added minimal runtime hook:
+  - `voxmlx/generate.py` now accepts optional `audio_override` buffer for clipped in-memory runs (default behavior unchanged).
+- Documentation updated for the new diagnostic workflow:
+  - `RUNBOOK.md`
+  - `docs/correctness_performance.md`
+- Instrumentation evaluation run (DFT, 120s clip):
+  - command:
+    - `VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python scripts/trace_nonincremental_vs_incremental.py --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --clip-seconds 120 --output-dir perf/audio_runs`
+  - artifact dir: `perf/audio_runs/trace-noninc-vs-inc-20260209T151236Z/`
+  - elapsed:
+    - non-incremental: `52.307s`
+    - incremental: `91.503s`
+  - output sizes:
+    - both token counts: `1510`
+  - divergence:
+    - first token divergence index: `50`
+    - first meaningful divergence index: `50`
+    - token Levenshtein: `384` (`0.254305` normalized vs incremental)
+    - meaningful spans: `64` (of `65` non-equal spans)
+  - observation: early divergence is dominated by special-token pattern shifts (`[STREAMING_PAD]`, `[STREAMING_WORD]`), not just punctuation/case.
+- Focused step-through run (DFT, 120s, focus token 50):
+  - command:
+    - `VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python scripts/trace_nonincremental_vs_incremental.py --audio-path perf/reference_audio/Paul_Solt_Ideating-and-developing-with-ChatGPT-Pro_mono_16k_10min.wav --clip-seconds 120 --focus-token-index 50 --focus-window 2 --trace-topk 8 --output-dir perf/audio_runs`
+  - artifact dir: `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/`
+  - replay consistency check: `non_incremental_replay_matches_generate = true`
+  - focus results:
+    - indices traced: `[48, 49, 50, 51, 52]`
+    - token 49: both emit `32` (`[STREAMING_PAD]`), producer argmax agrees (`32`)
+    - token 50: divergence starts; non-incremental emits `32` (`[STREAMING_PAD]`), incremental emits `33` (`[STREAMING_WORD]`)
+    - at token 50 producer step:
+      - both use same producer audio position (`88`) and same input token (`32`)
+      - argmax flips:
+        - non-incremental argmax: `32`
+        - incremental argmax: `33`
+      - top-k overlap shrinks; scores reorder substantially
+    - downstream tokens 51+ diverge further due changed decoder context.
+  - additional embedding check (120s clip):
+    - non-incremental vs incremental encoder embeddings differ from very early positions (`first >1e-3 at idx 0`, `first >1e-2 at idx 2`)
+    - global max abs embed diff across positions: `4.375`; mean max-abs-per-position: `0.9308`
+    - near divergence region (audio pos 86..90): max abs diffs ~`0.063` to `0.25`
+  - interpretation: first output-token divergence at index 50 is caused by decoder argmax flip under same token history/audio position, strongly indicating upstream audio embedding mismatch between non-incremental and incremental encode paths.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -146,11 +214,10 @@ Next:
 - Address any regressions found during matrix runs.
 - Use the new KV/RoPE scaffold tests while implementing ring-buffer cache replacement.
 - Add encoder offline-vs-incremental equivalence test coverage.
-- If needed, add token-level instrumentation to log raw token IDs + special/non-special ratios over time.
 - Investigate encoder cached attention alignment (`mask="causal"` with `q_len != k_len`) as primary suspect for contract failure.
+- Use focused tracer around first divergence while testing encoder-alignment fixes; success criterion is stable argmax agreement at/after index 50 on the 120s diagnostic run.
 - Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
 - Rebaseline existing perf run deviation metrics against updated ground truth.
-- Compute direct diff metrics between `incremental-file-10min-... (dft)` and new FFT transcript.
 - Optionally regenerate with identical timing conditions on a quieter machine for cleaner speed comparison.
 
 Open questions (UNCONFIRMED if needed):
@@ -167,6 +234,8 @@ Working set (files/ids/commands):
 - `perf/audio_runs/incremental-file-10min-fft-*/mono_incremental_transcript.txt`
 - `perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/mono_incremental_transcript_fft.txt`
 - `perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/summary.json`
+- `perf/audio_runs/semantic-compare-dft-vs-fft-20260209T143909Z/comparison.json`
+- `perf/audio_runs/semantic-compare-dft-vs-fft-20260209T143909Z/summary.md`
 - `voxmlx/generate.py`
 - `voxmlx/cache.py`
 - `voxmlx/model.py`
@@ -176,12 +245,20 @@ Working set (files/ids/commands):
 - `voxmlx/contracts.py`
 - `voxmlx/__init__.py`
 - `scripts/audio_eval.py`
+- `scripts/trace_nonincremental_vs_incremental.py`
 - `voxmlx/audio.py`
 - `voxmlx/generate.py`
+- `RUNBOOK.md`
+- `docs/correctness_performance.md`
+- `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/comparison.json`
+- `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/non_incremental_focus_trace.json`
+- `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/incremental_focus_trace.json`
+- `perf/audio_runs/trace-noninc-vs-inc-20260209T154656Z/focus_pairwise.json`
 - `perf/ground_truth_mono.txt`
 - `perf/audio_runs/*/metrics.json`
 - `perf/audio_runs/*/*_transcript.txt`
 - `PYTHONPATH=. .venv313/bin/python scripts/audio_eval.py --label ...`
+- `VOXMLX_STFT_BACKEND=dft PYTHONPATH=. .venv313/bin/python scripts/trace_nonincremental_vs_incremental.py --audio-path ... --clip-seconds 120`
 - `scripts/run_version_matrix.py`
 - `perf/version_matrix.json`
 - `PYTHONPATH=. .venv313/bin/python scripts/run_version_matrix.py --matrix perf/version_matrix.json --dry-run`

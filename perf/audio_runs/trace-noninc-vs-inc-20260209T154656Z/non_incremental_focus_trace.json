@@ -1,0 +1,357 @@
+[
+  {
+    "output_index": 48,
+    "token_id": 32,
+    "token_text_keep": "[STREAMING_PAD]",
+    "token_is_special": true,
+    "producer": {
+      "source": "step",
+      "audio_pos": 86,
+      "input_token_id": 32,
+      "input_token_text_keep": "[STREAMING_PAD]",
+      "audio_embed_stats": {
+        "l2_norm": 11.364974021911621,
+        "mean_abs": 0.05559219792485237,
+        "max_abs": 10.5625
+      },
+      "step_embed_stats": {
+        "l2_norm": 11.336746215820312,
+        "mean_abs": 0.054335832595825195,
+        "max_abs": 10.5625
+      },
+      "logits_topk": {
+        "argmax_id": 32,
+        "argmax_logit": -0.01806640625,
+        "top_ids": [
+          32,
+          33,
+          2,
+          1044,
+          1046,
+          1362,
+          1261,
+          2880
+        ],
+        "top_logits": [
+          -0.01806640625,
+          -15.9375,
+          -18.75,
+          -19.75,
+          -20.5,
+          -22.875,
+          -23.0,
+          -23.375
+        ],
+        "top_text_keep": [
+          "[STREAMING_PAD]",
+          "[STREAMING_WORD]",
+          "</s>",
+          ",",
+          ".",
+          " I",
+          " a",
+          "..."
+        ],
+        "top_is_special": [
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    "cache_offsets": {
+      "0": 88,
+      "13": 88,
+      "25": 88
+    }
+  },
+  {
+    "output_index": 49,
+    "token_id": 32,
+    "token_text_keep": "[STREAMING_PAD]",
+    "token_is_special": true,
+    "producer": {
+      "source": "step",
+      "audio_pos": 87,
+      "input_token_id": 32,
+      "input_token_text_keep": "[STREAMING_PAD]",
+      "audio_embed_stats": {
+        "l2_norm": 10.938669204711914,
+        "mean_abs": 0.054737240076065063,
+        "max_abs": 10.25
+      },
+      "step_embed_stats": {
+        "l2_norm": 10.911697387695312,
+        "mean_abs": 0.05340731143951416,
+        "max_abs": 10.25
+      },
+      "logits_topk": {
+        "argmax_id": 32,
+        "argmax_logit": 0.033447265625,
+        "top_ids": [
+          32,
+          33,
+          2,
+          1044,
+          1046,
+          1362,
+          1261,
+          1032
+        ],
+        "top_logits": [
+          0.033447265625,
+          -13.5,
+          -19.375,
+          -20.75,
+          -21.375,
+          -22.625,
+          -23.125,
+          -23.875
+        ],
+        "top_text_keep": [
+          "[STREAMING_PAD]",
+          "[STREAMING_WORD]",
+          "</s>",
+          ",",
+          ".",
+          " I",
+          " a",
+          " "
+        ],
+        "top_is_special": [
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    "cache_offsets": {
+      "0": 89,
+      "13": 89,
+      "25": 89
+    }
+  },
+  {
+    "output_index": 50,
+    "token_id": 32,
+    "token_text_keep": "[STREAMING_PAD]",
+    "token_is_special": true,
+    "producer": {
+      "source": "step",
+      "audio_pos": 88,
+      "input_token_id": 32,
+      "input_token_text_keep": "[STREAMING_PAD]",
+      "audio_embed_stats": {
+        "l2_norm": 10.729209899902344,
+        "mean_abs": 0.04846083000302315,
+        "max_abs": 10.125
+      },
+      "step_embed_stats": {
+        "l2_norm": 10.688748359680176,
+        "mean_abs": 0.04638016223907471,
+        "max_abs": 10.125
+      },
+      "logits_topk": {
+        "argmax_id": 32,
+        "argmax_logit": -11.6875,
+        "top_ids": [
+          32,
+          33,
+          1044,
+          2,
+          1046,
+          1261,
+          1362,
+          1063
+        ],
+        "top_logits": [
+          -11.6875,
+          -17.625,
+          -28.75,
+          -29.5,
+          -29.75,
+          -32.75,
+          -33.0,
+          -33.0
+        ],
+        "top_text_keep": [
+          "[STREAMING_PAD]",
+          "[STREAMING_WORD]",
+          ",",
+          "</s>",
+          ".",
+          " a",
+          " I",
+          "?"
+        ],
+        "top_is_special": [
+          true,
+          true,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    "cache_offsets": {
+      "0": 90,
+      "13": 90,
+      "25": 90
+    }
+  },
+  {
+    "output_index": 51,
+    "token_id": 33,
+    "token_text_keep": "[STREAMING_WORD]",
+    "token_is_special": true,
+    "producer": {
+      "source": "step",
+      "audio_pos": 89,
+      "input_token_id": 32,
+      "input_token_text_keep": "[STREAMING_PAD]",
+      "audio_embed_stats": {
+        "l2_norm": 10.698097229003906,
+        "mean_abs": 0.04576638340950012,
+        "max_abs": 10.1875
+      },
+      "step_embed_stats": {
+        "l2_norm": 10.673480033874512,
+        "mean_abs": 0.04432498291134834,
+        "max_abs": 10.1875
+      },
+      "logits_topk": {
+        "argmax_id": 33,
+        "argmax_logit": 0.08447265625,
+        "top_ids": [
+          33,
+          32,
+          1044,
+          1046,
+          4493,
+          1362,
+          1681,
+          2
+        ],
+        "top_logits": [
+          0.08447265625,
+          -12.125,
+          -20.5,
+          -21.25,
+          -21.375,
+          -21.875,
+          -21.875,
+          -22.125
+        ],
+        "top_text_keep": [
+          "[STREAMING_WORD]",
+          "[STREAMING_PAD]",
+          ",",
+          ".",
+          " So",
+          " I",
+          "'s",
+          "</s>"
+        ],
+        "top_is_special": [
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true
+        ]
+      }
+    },
+    "cache_offsets": {
+      "0": 91,
+      "13": 91,
+      "25": 91
+    }
+  },
+  {
+    "output_index": 52,
+    "token_id": 4493,
+    "token_text_keep": " So",
+    "token_is_special": false,
+    "producer": {
+      "source": "step",
+      "audio_pos": 90,
+      "input_token_id": 33,
+      "input_token_text_keep": "[STREAMING_WORD]",
+      "audio_embed_stats": {
+        "l2_norm": 9.633950233459473,
+        "mean_abs": 0.045058637857437134,
+        "max_abs": 9.125
+      },
+      "step_embed_stats": {
+        "l2_norm": 9.619795799255371,
+        "mean_abs": 0.04436013102531433,
+        "max_abs": 9.125
+      },
+      "logits_topk": {
+        "argmax_id": 4493,
+        "argmax_logit": -0.09912109375,
+        "top_ids": [
+          4493,
+          3626,
+          3060,
+          3870,
+          1878,
+          32,
+          7490,
+          2898
+        ],
+        "top_logits": [
+          -0.09912109375,
+          -17.75,
+          -17.875,
+          -18.0,
+          -18.625,
+          -18.75,
+          -18.75,
+          -19.125
+        ],
+        "top_text_keep": [
+          " So",
+          " But",
+          " And",
+          " To",
+          " so",
+          "[STREAMING_PAD]",
+          " Just",
+          " For"
+        ],
+        "top_is_special": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false
+        ]
+      }
+    },
+    "cache_offsets": {
+      "0": 92,
+      "13": 92,
+      "25": 92
+    }
+  }
+]
