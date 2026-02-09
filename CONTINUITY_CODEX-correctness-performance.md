@@ -292,6 +292,7 @@ Next:
 - Proposed fix sequencing:
   - correctness-first: unify offline encoding path to use the same incremental encoder algorithm as `encode_step` (eliminate path mismatch by construction).
   - deeper investigation: continue probing MLX full-vs-cached transformer history semantics if we want true mathematical parity between both encoder APIs.
+  - note: latest commit with layerwise isolation (`da4d5ba`) is currently local-only because push attempts failed with GitHub HTTP 500; branch is ahead by 1.
 - Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
 - Rebaseline existing perf run deviation metrics against updated ground truth.
 - Optionally regenerate with identical timing conditions on a quieter machine for cleaner speed comparison.
