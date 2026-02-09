@@ -26,7 +26,7 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: commit and push follow-up constants/validation cleanup from review issue #12.
+- Now: waiting for next requested issue/run after pushing #10 and #12 fixes.
 - Next: rerun updated 10-minute matrix on Mac Mini for 10x repeats per version.
 
 Done:
@@ -77,7 +77,7 @@ Done:
   - `python3 -m py_compile voxmlx/__init__.py voxmlx/contracts.py voxmlx/stream.py` -> pass.
 
 Now:
-- Commit and push constants/validation follow-up and ledger updates.
+- Hold for next requested issue or execute 10-minute matrix workflow.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -105,6 +105,7 @@ Working set (files/ids/commands):
 - Baseline commit: `f4d7d09`
 - Optimized commit: `ea25661`
 - Streaming class-refactor commit: `cce41e1`
+- Constants/config-validation follow-up commit: `dc994b1`
 
 Performance results table:
 | Label | Change summary | Commit | Model | Config | Audio | Time (s) | Speedup vs baseline | Deviation vs GT (norm edit / token err) | Notes |
