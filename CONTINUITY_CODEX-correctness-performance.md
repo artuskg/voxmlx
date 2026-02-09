@@ -26,8 +26,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: set the 10-minute incremental mono transcript as new ground truth text.
-- Next: recompute/report metrics against updated ground truth as needed.
+- Now: FFT incremental 10-minute transcript generated and stored in separate run directory for direct comparison.
+- Next: compute richer diff metrics between DFT and FFT transcripts if needed.
 
 Done:
 - Added deterministic correctness/perf scaffold and CI.
@@ -112,6 +112,13 @@ Done:
   - new SHA-256: `8febd5d6bf793ce775a9e3f4372c66b51e19fd1d476a58ce8be13abc63936e79`
   - previous ground truth backed up at `perf/ground_truth_mono.pre_incremental_10min.txt`
   - previous SHA-256: `c884ae4d490915b3d5bd6cfc61d1cb37485d58df1b4cd92404ec2fbb95348e5f`
+- Generated side-by-side FFT incremental output:
+  - run dir: `perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/`
+  - transcript: `perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/mono_incremental_transcript_fft.txt`
+  - summary: `perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/summary.json`
+  - config: `method=incremental_file_pipeline`, `stft_backend=fft`
+  - elapsed: `614.701s`, tokens=`7510`, chars=`8454`
+  - word count parity with DFT transcript: both `1628` words.
 - Validation from this pass:
   - `python3 -m unittest discover -s tests -p 'test_*.py' -v` -> pass (optional suites skipped by env gate).
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
@@ -132,7 +139,7 @@ Done:
     - observed: `abs_err = 2.4375` (threshold `1e-4`), shape matched.
 
 Now:
-- Explain STFT backend options and current tradeoffs.
+- Share FFT output path/metadata with user for direct side-by-side comparison.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -143,6 +150,8 @@ Next:
 - Investigate encoder cached attention alignment (`mask="causal"` with `q_len != k_len`) as primary suspect for contract failure.
 - Compute quality metrics for the new incremental transcript vs ground truth and baseline runs.
 - Rebaseline existing perf run deviation metrics against updated ground truth.
+- Compute direct diff metrics between `incremental-file-10min-... (dft)` and new FFT transcript.
+- Optionally regenerate with identical timing conditions on a quieter machine for cleaner speed comparison.
 
 Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
@@ -155,6 +164,9 @@ Working set (files/ids/commands):
 - `perf/audio_runs/incremental-file-10min-20260209T135727Z/summary.json`
 - `perf/ground_truth_mono.txt`
 - `perf/ground_truth_mono.pre_incremental_10min.txt`
+- `perf/audio_runs/incremental-file-10min-fft-*/mono_incremental_transcript.txt`
+- `perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/mono_incremental_transcript_fft.txt`
+- `perf/audio_runs/incremental-file-10min-fft-20260209T142155Z/summary.json`
 - `voxmlx/generate.py`
 - `voxmlx/cache.py`
 - `voxmlx/model.py`
