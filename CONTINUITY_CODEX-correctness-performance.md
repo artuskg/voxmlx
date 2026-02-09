@@ -26,7 +26,7 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: waiting for next requested issue/run after pushing #10 and #12 fixes.
+- Now: verification pass against updated external review is complete; commit/push hardening fixes.
 - Next: rerun updated 10-minute matrix on Mac Mini for 10x repeats per version.
 
 Done:
@@ -56,8 +56,8 @@ Done:
 - Updated docs/runbook examples to 10-minute reference audio workflow.
 - Validated `scripts/run_version_matrix.py` with `--dry-run` against updated matrix.
 - Consolidated review issue status (current pass):
-  - #1 (P0) Fixed: encoder cache now uses `self.encoder.sliding_window` in `voxmlx/model.py`.
-  - #2 (P0) Fixed: `_update_concat` trim math corrected for `S>1` and bounded assertions added in `voxmlx/cache.py`.
+  - #1 (P0) Fixed: encoder cache uses `self.encoder.sliding_window` in `voxmlx/model.py`, now with strict sanity guard (`0 < window < 10000`).
+  - #2 (P0) Fixed: `_update_concat` trim math corrected for `S>1`, bounded assertions apply on all paths, and oversized first concat updates are now capped to `max_size` in `voxmlx/cache.py`.
   - #3 (P0) Fixed: offline `encode()` now trims trailing frames (`[:-1]`, `[:-remainder]`) in `voxmlx/model.py`.
   - #4 Fixed: removed unreachable EOS tail check in `voxmlx/generate.py`.
   - #5 Fixed: callback buffer no longer uses `np.append`; now chunk queue (`AudioSampleQueue`) in `voxmlx/stream.py`.
@@ -75,9 +75,11 @@ Done:
   - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass.
   - `python3 -m py_compile voxmlx/stream.py voxmlx/audio.py voxmlx/model.py` -> pass.
   - `python3 -m py_compile voxmlx/__init__.py voxmlx/contracts.py voxmlx/stream.py` -> pass.
+  - `python3 -m py_compile voxmlx/cache.py voxmlx/model.py voxmlx/stream.py voxmlx/audio.py` -> pass.
+  - `PYTHONPATH=. VOXMLX_ENABLE_MLX_RUNTIME_TESTS=1 .venv313/bin/python -m unittest tests.test_mlx_runtime_optional -v` -> pass after adding first-update oversize cache guard test.
 
 Now:
-- Hold for next requested issue or execute 10-minute matrix workflow.
+- Commit/push review hardening updates and provide itemized verification summary.
 
 Next:
 - Execute updated 10-minute matrix on Mac Mini and compare aggregate stats.
@@ -87,7 +89,11 @@ Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: target clip/window for sign-off beyond 180s (if user wants larger test window now).
 
 Working set (files/ids/commands):
+- `voxmlx/cache.py`
+- `voxmlx/model.py`
 - `voxmlx/stream.py`
+- `voxmlx/audio.py`
+- `tests/test_mlx_runtime_optional.py`
 - `voxmlx/contracts.py`
 - `voxmlx/__init__.py`
 - `scripts/audio_eval.py`

@@ -142,6 +142,8 @@ class StreamingTranscriber:
 
         self.lock = threading.Lock()
         self.callback_chunks = deque()
+        self._audio_status_count = 0
+        self._last_audio_status = None
 
         self.reset_all_state()
 
@@ -166,15 +168,26 @@ class StreamingTranscriber:
         self.prefilled = False
 
     def callback(self, indata, frames, time_info, status):
-        del frames, time_info, status
+        del frames, time_info
         with self.lock:
             self.callback_chunks.append(indata[:, 0].copy())
+            if status:
+                self._audio_status_count += 1
+                self._last_audio_status = str(status)
 
     def _drain_callback_chunks(self):
         with self.lock:
             chunks = list(self.callback_chunks)
             self.callback_chunks.clear()
         return chunks
+
+    def _drain_audio_status(self):
+        with self.lock:
+            count = self._audio_status_count
+            last = self._last_audio_status
+            self._audio_status_count = 0
+            self._last_audio_status = None
+        return count, last
 
     def sample(self, logits):
         if self.temperature <= 0:
@@ -309,6 +322,13 @@ class StreamingTranscriber:
                 new_chunks = self._drain_callback_chunks()
                 if new_chunks:
                     self.pending_audio.append_many(new_chunks)
+                status_count, last_status = self._drain_audio_status()
+                if status_count > 0:
+                    print(
+                        f"Warning: audio callback reported {status_count} status event(s)"
+                        f" (last: {last_status}).",
+                        flush=True,
+                    )
 
                 if self.first_cycle and len(self.pending_audio) < SAMPLES_PER_TOKEN:
                     elapsed = time.monotonic() - start_time

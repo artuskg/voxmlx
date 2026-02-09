@@ -25,6 +25,14 @@ class MlxRuntimeOptionalTests(unittest.TestCase):
 
         from voxmlx.cache import RotatingKVCache
 
+        # Oversized first concat update should still honor max_size.
+        first_big = RotatingKVCache(max_size=4)
+        keys = mx.arange(7, dtype=mx.float32).reshape(1, 1, 7, 1)
+        values = mx.arange(7, dtype=mx.float32).reshape(1, 1, 7, 1)
+        k0, v0 = first_big.update_and_fetch(keys, values)
+        self.assertEqual(k0.shape[2], 4)
+        self.assertEqual(v0.shape[2], 4)
+
         cache = RotatingKVCache(max_size=8)
 
         for span in (3, 4, 5):

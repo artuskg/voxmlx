@@ -16,7 +16,10 @@ SAMPLES_PER_TOKEN = HOP_LENGTH * 2 * 4  # hop * conv_stride * downsample = 1280
 
 
 def load_audio(path: str) -> np.ndarray:
-    audio, sr = sf.read(path, dtype="float32")
+    try:
+        audio, sr = sf.read(path, dtype="float32")
+    except Exception as exc:
+        raise RuntimeError(f"Failed to read audio file {path!r}: {exc}") from exc
     if audio.ndim > 1:
         audio = audio.mean(axis=1)
     if sr != SAMPLE_RATE:
