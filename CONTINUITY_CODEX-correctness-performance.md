@@ -25,8 +25,8 @@ Key decisions:
 
 State:
 - Done: implemented and validated >=10% speedup while preserving baseline deviation profile.
-- Now: completed incremental-only 10s dry-run + full sequential matrix run from consolidated branch head.
-- Next: decide whether to commit matrix-runner compatibility fixes (old-ref constants fallback + remote-ref normalization) into the branch or keep them as local runtime adjustments only.
+- Now: completed dedicated `voxtral.c` 10s retest with explicit hardware-acceleration verification on this machine.
+- Next: decide whether to evaluate voxtral.c timing with/without one-time load effect (process-persistent vs per-invocation) for fairer comparison against in-process MLX runs.
 
 Done:
 - 2026-02-09: Continued this continuity ledger in a new Codex session; reloaded prior context and kept workflow/targets unchanged.
@@ -237,6 +237,19 @@ Done:
     - `.../perf/audio_runs/audio_runs__perf_ea25661/mono_incremental_transcript.txt`
     - `.../perf/audio_runs/audio_runs__current_consolidated/mono_incremental_transcript.txt`
     - `.../perf/audio_runs/audio_runs__voxtralc_reference/mono_incremental_transcript.txt`
+- 2026-02-10: Retested `voxtral.c` directly on the same 10s mono clip and verified macOS HW acceleration:
+  - Command pattern (10 sequential runs): `/usr/bin/time -p /Users/crabbotix/gitrepos/voxtral.c/voxtral -d /Volumes/BigStore/voxtral-model -i <10s-clip>`
+  - Artifacts:
+    - `/Users/crabbotix/gitrepos/voxmlx/perf/voxtralc_retest_10s_20260210_082206/summary.json`
+    - `/Users/crabbotix/gitrepos/voxmlx/perf/voxtralc_retest_10s_20260210_082206/summary.csv`
+    - per-run logs: `run_*.stderr.txt`, `run_*.stdout.txt`
+  - Hardware acceleration evidence:
+    - all `10/10` runs include `Metal GPU: 8429.2 MB` in stderr
+  - Timing:
+    - all runs mean/std (`real`): `13.667s` / `4.201s`
+    - steady-state runs 2-10 mean/std: `12.278s` / `0.558s`
+  - Output consistency:
+    - `stdout` transcript hash identical across runs (single unique hash).
 - Added deterministic correctness/perf scaffold and CI.
 - Added optional model-backed differential tests and local project docs (`AGENTS.md`, `RUNBOOK.md`).
 - Installed runtime deps in `.venv313` and loaded `mlx-community/Voxtral-Mini-4B-Realtime-6bit`.
