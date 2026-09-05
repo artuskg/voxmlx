@@ -1,16 +1,12 @@
 # AGENTS.md — voxmlx
 
-## Sync policy (MANDATORY)
+## Shared policy
 
-- Keep shared baseline rules in this file synchronized with the ai-software-engineering counterpart at `~/[Gg]it[Rr]epos/ai-software-engineering/AGENTS.md`.
-- Do not hardcode machine-specific absolute paths for ai-software-engineering; discover it under `~/[Gg]it[Rr]epos/ai-software-engineering`.
-- When updating shared behavior rules in either file, update the other file in the same work session.
-- Proactively remind the user to keep ai-software-engineering and local agent configuration (for example `~/.codex` and `~/.agents/skills`) loosely in sync when either side changes.
-- Project-specific additions can stay only here, but they should be explicitly marked as project-specific.
+Follow the managed global policy and relevant skills. This file owns voxmlx-specific guidance; a repo task does not authorize changing global configuration or another repository.
 
 ## Continuity Ledger (compaction-safe)
 
-At the beginning of a new session, before starting the actual work, offer the user to maintain a single Continuity Ledger for this session in `CONTINUITY_CODEX-<sessionid>.md` or offer the user to continue an existing `CONTINUITY_CODEX-<sessionid>.md` in the current workspace.
+Create a continuity ledger only when requested, using `continuity_ledger`. Resume an existing ledger only when its goal matches the current task; bounded maintenance does not require a ledger offer.
 
 ### How it works (if the ledger is active for the current session)
 
@@ -40,10 +36,8 @@ At the beginning of a new session, before starting the actual work, offer the us
 
 ## Git hygiene baseline
 
-- If the tree is dirty and a pull is needed, use `git pull --rebase --autostash` unless the user requests otherwise.
-- Default assumption: for agent-authored changes in a git-tracked repo, commit and `git push` unless user opts out.
-- If push target is unclear, create and use a `codex/<topic>` branch first.
-- After push/cleanup requests, verify and report `git status --short`.
+- Use the managed `commit` skill for synchronization, commits, and publication. Publish verified agent-authored changes by default only to destinations it authorizes; preserve unrelated dirty work.
+- A pull-only request does not authorize publication. Resolve an unclear destination before pushing; do not invent a branch or remote.
 
 ## Local project docs recommendation
 
@@ -65,7 +59,7 @@ At the beginning of a new session, before starting the actual work, offer the us
 - 2026-02-09: Initial local policy file created for voxmlx to make project workflow explicit and compaction-safe.
 - 2026-02-09: Creating a new branch and committing succeeded, but push to `origin` failed with `403 (Permission to artuskg/voxmlx.git denied to Crabbotix)`; SSH fallback failed with host-key verification. Resolution: keep local branch/commits ready and report exact blocked push command for user-side credential/remote fix.
 - 2026-02-09: `pip install -e` failed in scaffold snapshot `bb7f2c1` after adding committed audio under `perf/reference_audio`, because setuptools auto-discovered multiple top-level packages (`perf`, `voxmlx`). Resolution: for benchmark execution, skip editable install and install runtime dependencies directly (`pip install mlx numpy soundfile sounddevice huggingface-hub mistral-common sentencepiece`) while using `PYTHONPATH=.` for local imports.
-- 2026-02-09: Cleanup command with `rm -rf` was blocked by session policy even for temporary benchmark artifacts. Resolution: use a short Python cleanup snippet (`shutil.rmtree`/`Path.unlink`) for deterministic artifact removal when shell deletion is policy-blocked.
+- On a policy denial, inspect and report the stated reason. Use another implementation only for a syntax/tool failure when the underlying operation remains authorized; never translate an operation-level denial into another tool.
 - 2026-02-09: User-aborted matrix runs can leave child `audio_eval.py` processes alive and writing partial artifacts. Resolution: always probe/stop lingering benchmark PIDs (`pgrep -fl 'run_version_matrix.py|audio_eval.py'`) before starting a new campaign and treat partial campaign folders as non-final.
 - 2026-02-09: Apparent long-audio transcription quality was misleading because the pipeline compared against model-derived ground truth. The model generated extensive `[STREAMING_PAD]` tokens (visible with `SpecialTokenPolicy.KEEP`) while `IGNORE` decoding made transcripts look short but stable. Resolution: do not treat model-derived GT as quality truth for long-form audio; inspect raw token composition and compare against human/reference transcripts before drawing correctness conclusions.
 - 2026-02-09: Attempted to run `../voxtral.c` against the MLX-converted local snapshot and hit tensor-name/file mismatch errors (expects Mistral layout like `consolidated.safetensors`). Confusing because both are Voxtral-family weights but not format-compatible. Resolution: use `voxtral.c/download_model.sh` to fetch native weights and store them under `/Volumes/BigStore/voxtral-model`; treat MLX and `voxtral.c` model directories as separate artifacts.
